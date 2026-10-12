@@ -3,13 +3,13 @@ import type {
   PaginatedQueryArgs,
   PaginatedQueryReference,
   UsePaginatedQueryReturnType,
-} from "convex/react";
+} from "bijection/react";
 import {
-  useConvex,
+  useBijection,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ConvexProvider,
+  BijectionProvider,
   useQueries as useQueriesCore,
-} from "convex/react";
+} from "bijection/react";
 import type {
   FunctionArgs,
   FunctionReference,
@@ -17,16 +17,16 @@ import type {
   FunctionReturnType,
   paginationOptsValidator,
   PaginationResult,
-} from "convex/server";
-import { getFunctionName } from "convex/server";
+} from "bijection/server";
+import { getFunctionName } from "bijection/server";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { ConvexQueryCacheContext } from "./provider.js";
+import { BijectionQueryCacheContext } from "./provider.js";
 import {
-  ConvexError,
-  convexToJson,
+  BijectionError,
+  bijectionToJson,
   type Infer,
   type Value,
-} from "convex/values";
+} from "bijection/values";
 
 const uuid =
   typeof crypto !== "undefined" && crypto.randomUUID
@@ -76,7 +76,7 @@ const uuid =
  * This React hook contains internal state that will cause a rerender
  * whenever any of the query results change.
  *
- * Throws an error if not used under {@link ConvexProvider}.
+ * Throws an error if not used under {@link BijectionProvider}.
  *
  * @param queries - An object mapping identifiers to objects of
  * `{query: string, args: Record<string, Value> }` describing which query
@@ -94,11 +94,11 @@ export function useQueries(
     Pick<Parameters<typeof useQueriesCore>[0][string], "query" | "args">
   >,
 ): Record<string, any | undefined | Error> {
-  const { registry } = useContext(ConvexQueryCacheContext);
+  const { registry } = useContext(BijectionQueryCacheContext);
   if (registry === null) {
     throw new Error(
-      "Could not find `ConvexQueryCacheContext`! This `useQuery` implementation must be used in the React component " +
-        "tree under `ConvexQueryCacheProvider`. Did you forget it? ",
+      "Could not find `BijectionQueryCacheContext`! This `useQuery` implementation must be used in the React component " +
+        "tree under `BijectionQueryCacheProvider`. Did you forget it? ",
     );
   }
   const queryKeys: Record<string, string> = {};
@@ -133,7 +133,7 @@ export function useQueries(
  * This React hook contains internal state that will cause a rerender
  * whenever the query result changes.
  *
- * Throws an error if not used under {@link ConvexProvider} and {@link ConvexQueryCacheProvider}.
+ * Throws an error if not used under {@link BijectionProvider} and {@link BijectionQueryCacheProvider}.
  *
  * @param query - a {@link FunctionReference} for the public query to run
  * like `api.dir1.dir2.filename.func`.
@@ -180,7 +180,7 @@ function createQueryKey<
   Query extends FunctionReference<"query"> | FunctionReference_future<"query">,
 >(query: Query, args: FunctionArgs<Query>): string {
   const queryString = getFunctionName(query);
-  const key = [queryString, convexToJson(args)];
+  const key = [queryString, bijectionToJson(args)];
   const queryKey = JSON.stringify(key);
   return queryKey;
 }
@@ -381,7 +381,7 @@ export function usePaginatedQuery<Query extends PaginatedQueryReference>(
     // we want to avoid rerendering if the args are a different
     // object that serializes to the same result.
   }, [
-    JSON.stringify(convexToJson(argsObject as Value)),
+    JSON.stringify(bijectionToJson(argsObject as Value)),
     queryName,
     options.initialNumItems,
     skip,
@@ -395,13 +395,13 @@ export function usePaginatedQuery<Query extends PaginatedQueryReference>(
   if (
     skip !== state.skip ||
     getFunctionName(query) !== getFunctionName(state.query) ||
-    JSON.stringify(convexToJson(argsObject as Value)) !==
-      JSON.stringify(convexToJson(state.args))
+    JSON.stringify(bijectionToJson(argsObject as Value)) !==
+      JSON.stringify(bijectionToJson(state.args))
   ) {
     currState = createInitialState();
     setState(currState);
   }
-  const convexClient = useConvex();
+  const convexClient = useBijection();
   const logger = convexClient.logger;
 
   const resultsObject = useQueries(currState.queries);
@@ -422,7 +422,7 @@ export function usePaginatedQuery<Query extends PaginatedQueryReference>(
       if (currResult instanceof Error) {
         if (
           currResult.message.includes("InvalidCursor") ||
-          (currResult instanceof ConvexError &&
+          (currResult instanceof BijectionError &&
             typeof currResult.data === "object" &&
             currResult.data?.isConvexSystemError === true &&
             currResult.data?.paginationError === "InvalidCursor")

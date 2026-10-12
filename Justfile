@@ -62,3 +62,7 @@ convex *ARGS:
 # Clears a table in the cloud backend.
 clear-table *ARGS:
   npx convex import --table "$1" --replace --format jsonLines /dev/null "${@:2}"
+
+# Bijection uses its existing source-preservation owner.
+concave *ARGS:
+  cd tools/concave && GOWORK=off go run ./cmd/concave --repo ../.. {{ARGS}}

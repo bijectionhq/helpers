@@ -1,7 +1,7 @@
-import { defineSchema, defineTable } from "convex/server";
-import { getDocumentSize, v } from "convex/values";
-import type { GenericId } from "convex/values";
-import { convexTest } from "convex-test";
+import { defineSchema, defineTable } from "bijection/server";
+import { getDocumentSize, v } from "bijection/values";
+import type { GenericId } from "bijection/values";
+import { bijectionTest } from "@bijectionhq/test";
 import { describe, expect, test } from "vitest";
 import { mergedStream, stream } from "./stream.js";
 import { modules } from "./setup.test.js";
@@ -19,7 +19,7 @@ describe.each(["asc", "desc"] as const)("flatMap resume (%s)", (order) => {
   test.each([{ maximumRowsRead: 1 }, { maximumBytesRead: 1 }])(
     "budgeted walks advance past empty and filtered items: %j",
     async (limit) => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       await t.run(async (ctx) => {
         const groupIds: GenericId<"groups">[] = [];
         for (let position = 0; position < 3; position++) {
@@ -111,7 +111,7 @@ describe.each(["asc", "desc"] as const)("flatMap resume (%s)", (order) => {
   );
 
   test("suppressed placeholders carry their bandwidth to the next result", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       const firstId = await ctx.db.insert("groups", {
         position: order === "asc" ? 0 : 2,
@@ -162,7 +162,7 @@ describe.each(["asc", "desc"] as const)("flatMap resume (%s)", (order) => {
   });
 
   test("placeholder endpoints keep adjacent pages contiguous after inserts", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       const firstId = await ctx.db.insert("groups", { position: 0 });
       const db = stream(ctx.db, schema);

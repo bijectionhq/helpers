@@ -9,14 +9,14 @@ import type {
   FunctionVisibility,
   Scheduler,
   DefaultFunctionArgs,
-} from "convex/server";
+} from "bijection/server";
 import {
   internalMutationGeneric,
   getFunctionName,
   makeFunctionReference,
-} from "convex/server";
-import type { ObjectType } from "convex/values";
-import { v } from "convex/values";
+} from "bijection/server";
+import type { ObjectType } from "bijection/values";
+import { v } from "bijection/values";
 import { omit } from "../index.js";
 
 const DEFAULTS = {
@@ -31,7 +31,7 @@ const DEFAULTS = {
  * e.g.
  * ```ts
  * // in convex/utils.ts
- * import { makeActionRetrier } from "convex-helpers/server/retries";
+ * import { makeActionRetrier } from "@bijectionhq/helpers/server/retries";
  *
  * export const { runWithRetries, retry } = makeActionRetrier("utils:retry");
  *

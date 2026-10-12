@@ -1,8 +1,8 @@
 import { filter } from "./filter.js";
-import { convexTest } from "convex-test";
-import { v } from "convex/values";
+import { bijectionTest } from "@bijectionhq/test";
+import { v } from "bijection/values";
 import { expect, test } from "vitest";
-import { defineSchema, defineTable } from "convex/server";
+import { defineSchema, defineTable } from "bijection/server";
 import { modules } from "./setup.test.js";
 
 const schema = defineSchema({
@@ -16,7 +16,7 @@ const schema = defineSchema({
 });
 
 test("filter", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   await t.run(async (ctx) => {
     for (let i = 0; i < 10; i++) {
       const tableAId = await ctx.db.insert("tableA", { count: i });

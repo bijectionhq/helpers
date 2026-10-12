@@ -1,4 +1,4 @@
-import { convexTest } from "convex-test";
+import { bijectionTest } from "@bijectionhq/test";
 import { expect, test } from "vitest";
 import { crud } from "./crud.js";
 import type {
@@ -6,10 +6,10 @@ import type {
   DataModelFromSchemaDefinition,
   MutationBuilder,
   QueryBuilder,
-} from "convex/server";
-import { anyApi, defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
-import { internalQueryGeneric, internalMutationGeneric } from "convex/server";
+} from "bijection/server";
+import { anyApi, defineSchema, defineTable } from "bijection/server";
+import { v } from "bijection/values";
+import { internalQueryGeneric, internalMutationGeneric } from "bijection/server";
 import { modules } from "./setup.test.js";
 import { customCtx, customMutation, customQuery } from "./customFunctions.js";
 
@@ -140,7 +140,7 @@ const complexTestApi: ApiFromModules<{
 }>["fns"] = anyApi["crud.test"] as any;
 
 test("crud for table", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const doc = await t.mutation(testApi.create, { foo: "", bar: null });
   expect(doc).toMatchObject({ foo: "", bar: null });
   const read = await t.query(testApi.read, { id: doc._id });
@@ -159,7 +159,7 @@ test("crud for table", async () => {
 });
 
 test("union table - user type", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const userDoc = await t.mutation(unionTestApi.unionCreate, {
     type: "user",
     name: "John Doe",
@@ -193,7 +193,7 @@ test("union table - user type", async () => {
 });
 
 test("union table - admin type", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const adminDoc = await t.mutation(unionTestApi.unionCreate, {
     type: "admin",
     name: "Admin User",
@@ -221,7 +221,7 @@ test("union table - admin type", async () => {
 });
 
 test("union table - guest type", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const guestDoc = await t.mutation(unionTestApi.unionCreate, {
     type: "guest",
     sessionId: "session_123",
@@ -246,7 +246,7 @@ test("union table - guest type", async () => {
 });
 
 test("complex object - full structure", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const complexDoc = await t.mutation(complexTestApi.complexCreate, {
     profile: {
       name: "Complex User",
@@ -312,7 +312,7 @@ test("complex object - full structure", async () => {
 });
 
 test("complex object - partial updates", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const complexDoc = await t.mutation(complexTestApi.complexCreate, {
     profile: {
       name: "User",
@@ -374,7 +374,7 @@ test("complex object - partial updates", async () => {
 });
 
 test("complex object - optional fields", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const minimalDoc = await t.mutation(complexTestApi.complexCreate, {
     profile: {
       name: "Minimal User",
@@ -421,7 +421,7 @@ test("complex object - optional fields", async () => {
 });
 
 test("pagination works", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
 
   // Create multiple documents
   const docs: any[] = [];
@@ -450,7 +450,7 @@ test("pagination works", async () => {
 });
 
 test("destroy returns the deleted document", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const doc = await t.mutation(testApi.create, {
     foo: "to-delete",
     bar: null,
@@ -466,7 +466,7 @@ test("destroy returns the deleted document", async () => {
 });
 
 test("destroy non-existent document returns null", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const doc = await t.mutation(testApi.create, {
     foo: "temp",
     bar: null,
@@ -506,7 +506,7 @@ const customTestApi: ApiFromModules<{
 }>["fns"] = anyApi["crud.test"] as any;
 
 test("custom crud for table", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const doc = await t.mutation(customTestApi.create, { foo: "", bar: null });
   expect(doc).toMatchObject({ foo: "", bar: null });
   const read = await t.query(customTestApi.read, { id: doc._id });

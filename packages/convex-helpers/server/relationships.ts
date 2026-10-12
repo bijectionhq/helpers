@@ -10,8 +10,8 @@ import type {
   NamedTableInfo,
   IndexNames,
   FieldPaths,
-} from "convex/server";
-import type { GenericId } from "convex/values";
+} from "bijection/server";
+import type { GenericId } from "bijection/values";
 import { asyncMap, nullThrows } from "../index.js";
 
 /**

@@ -5,11 +5,11 @@ import type {
   RegisteredQuery,
   DefaultFunctionArgs,
   FunctionReference,
-} from "convex/server";
-import { defineTable, defineSchema, queryGeneric, anyApi } from "convex/server";
+} from "bijection/server";
+import { defineTable, defineSchema, queryGeneric, anyApi } from "bijection/server";
 import type { Equals } from "../index.js";
 import { omit } from "../index.js";
-import { convexTest } from "convex-test";
+import { bijectionTest } from "@bijectionhq/test";
 import { assertType, describe, expect, expectTypeOf, test } from "vitest";
 import { modules } from "./setup.test.js";
 import type { ZCustomCtx } from "./zod3.js";
@@ -17,15 +17,15 @@ import {
   zBrand,
   zCustomQuery,
   zid,
-  zodOutputToConvex,
-  zodToConvexFields,
-  zodToConvex,
+  zodOutputToBijection,
+  zodToBijectionFields,
+  zodToBijection,
   convexToZod,
   convexToZodFields,
 } from "./zod3.js";
 import { customCtx } from "./customFunctions.js";
-import type { VString, VFloat64, VObject, VId, Infer } from "convex/values";
-import { CommitTsPlaceholder, v } from "convex/values";
+import type { VString, VFloat64, VObject, VId, Infer } from "bijection/values";
+import { CommitTsPlaceholder, v } from "bijection/values";
 import { z } from "zod/v3";
 
 // This is an example of how to make a version of `zid` that
@@ -78,7 +78,7 @@ export const kitchenSinkValidator = {
 };
 
 const schema = defineSchema({
-  sink: defineTable(zodToConvexFields(kitchenSinkValidator)).index("email", [
+  sink: defineTable(zodToBijectionFields(kitchenSinkValidator)).index("email", [
     "email",
   ]),
   users: defineTable({}),
@@ -104,7 +104,7 @@ export const kitchenSink = zQuery({
   handler: async (_ctx, args) => {
     return {
       args,
-      json: (v.object(zodToConvexFields(kitchenSinkValidator)) as any).json,
+      json: (v.object(zodToBijectionFields(kitchenSinkValidator)) as any).json,
     };
   },
   returns: z.object({
@@ -402,7 +402,7 @@ const testApi: ApiFromModules<{
 }>["fns"] = anyApi["zod3.test"] as any;
 
 test("zod kitchen sink", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const userId = await t.run((ctx) => ctx.db.insert("users", {}));
   const kitchenSink = {
     email: "email@example.com",
@@ -588,51 +588,51 @@ test("zod kitchen sink", async () => {
 
 test("function that returns nothing has a return value of null", async () => {
   // `undefined` is not a valid Convex value, so functions returning `undefined` actually return `null`.
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const response = await t.query(testApi.returnsNothing, {});
   expect(response).toEqual(null);
   expectTypeOf(response).toExtend<null>();
 });
 
 test("zod date round trip", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const date = new Date().toISOString();
   const response = await t.query(testApi.dateRoundTrip, { date });
   expect(response).toBe(date);
 });
 
 test("zod fails returns validator", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   await expect(() =>
     t.query(testApi.failsReturnsValidator, {}),
   ).rejects.toThrow();
 });
 
 test("zod returns without args works", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const response = await t.query(testApi.returnsWithoutArgs, {});
   expect(response).toBe(1);
 });
 
 test("output validators work for arrays objects and unions", async () => {
-  const array = zodOutputToConvex(z.array(z.string().default("foo")));
+  const array = zodOutputToBijection(z.array(z.string().default("foo")));
   expect(array.kind).toBe("array");
   expect(array.element.kind).toBe("string");
   expect(array.element.isOptional).toBe("required");
-  const object = zodOutputToConvex(
+  const object = zodOutputToBijection(
     z.object({ foo: z.string().default("foo") }),
   );
   expect(object.kind).toBe("object");
   expect(object.fields.foo.kind).toBe("string");
   expect(object.fields.foo.isOptional).toBe("required");
-  const union = zodOutputToConvex(z.union([z.string(), z.number().default(0)]));
+  const union = zodOutputToBijection(z.union([z.string(), z.number().default(0)]));
   expect(union.kind).toBe("union");
   expect(union.members[0].kind).toBe("string");
   expect(union.members[1].kind).toBe("float64");
   expect(union.members[1].isOptional).toBe("required");
 });
 
-test("zodOutputToConvex infers required types for fields with defaults", () => {
+test("zodOutputToBijection infers required types for fields with defaults", () => {
   const zSimpleObject = z.object({
     age: z.number().default(25),
     name: z.string(),
@@ -640,18 +640,18 @@ test("zodOutputToConvex infers required types for fields with defaults", () => {
       .union([z.literal("active"), z.literal("inactive")])
       .default("active"),
   });
-  const vSimpleObject = zodOutputToConvex(zSimpleObject);
+  const vSimpleObject = zodOutputToBijection(zSimpleObject);
   type TZodSimpleObject = z.infer<typeof zSimpleObject>;
-  type TConvexSimpleObject = Infer<typeof vSimpleObject>;
+  type TBijectionSimpleObject = Infer<typeof vSimpleObject>;
 
   // Fields with defaults should be required (not optional) in the output type
-  expectTypeOf<TConvexSimpleObject["age"]>().toEqualTypeOf<
+  expectTypeOf<TBijectionSimpleObject["age"]>().toEqualTypeOf<
     TZodSimpleObject["age"]
   >();
-  expectTypeOf<TConvexSimpleObject["status"]>().toEqualTypeOf<
+  expectTypeOf<TBijectionSimpleObject["status"]>().toEqualTypeOf<
     TZodSimpleObject["status"]
   >();
-  expectTypeOf<TConvexSimpleObject>().toEqualTypeOf<TZodSimpleObject>();
+  expectTypeOf<TBijectionSimpleObject>().toEqualTypeOf<TZodSimpleObject>();
 
   // Validator objects should have isOptional: "required" for fields with defaults
   expect(vSimpleObject.fields.age.isOptional).toBe("required");
@@ -667,21 +667,21 @@ test("zodOutputToConvex infers required types for fields with defaults", () => {
     }),
     tags: z.array(z.string()).default([]),
   });
-  const vNestedObject = zodOutputToConvex(zNestedObject);
+  const vNestedObject = zodOutputToBijection(zNestedObject);
   type TZodNestedObject = z.infer<typeof zNestedObject>;
-  type TConvexNestedObject = Infer<typeof vNestedObject>;
+  type TBijectionNestedObject = Infer<typeof vNestedObject>;
 
   // Nested object fields with defaults should be required
-  expectTypeOf<TConvexNestedObject["tags"]>().toEqualTypeOf<
+  expectTypeOf<TBijectionNestedObject["tags"]>().toEqualTypeOf<
     TZodNestedObject["tags"]
   >();
-  expectTypeOf<TConvexNestedObject["profile"]["displayName"]>().toEqualTypeOf<
+  expectTypeOf<TBijectionNestedObject["profile"]["displayName"]>().toEqualTypeOf<
     TZodNestedObject["profile"]["displayName"]
   >();
-  expectTypeOf<TConvexNestedObject["profile"]["isPublic"]>().toEqualTypeOf<
+  expectTypeOf<TBijectionNestedObject["profile"]["isPublic"]>().toEqualTypeOf<
     TZodNestedObject["profile"]["isPublic"]
   >();
-  expectTypeOf<TConvexNestedObject>().toEqualTypeOf<TZodNestedObject>();
+  expectTypeOf<TBijectionNestedObject>().toEqualTypeOf<TZodNestedObject>();
 
   // Nested validator objects should have isOptional: "required" for fields with defaults
   expect(vNestedObject.fields.tags.isOptional).toBe("required");
@@ -695,7 +695,7 @@ test("zodOutputToConvex infers required types for fields with defaults", () => {
 });
 
 test("zod output compliance", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const response = await t.query(testApi.zodOutputCompliance, {});
   expect(response).toMatchObject({
     undefinedBecomesFooString: "foo",
@@ -720,7 +720,7 @@ test("zod output compliance", async () => {
 });
 
 test("zod args object", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   expect(await t.query(testApi.zodArgsObject, { a: "foo" })).toMatchObject({
     a: "foo",
   });
@@ -731,7 +731,7 @@ test("zod args object", async () => {
 
 describe("zod functions", () => {
   test("add ctx", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.addC, {})).toMatchObject({
       ctxA: "hi",
     });
@@ -744,7 +744,7 @@ describe("zod functions", () => {
   });
 
   test("add ctx with existing arg", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(
       await t.query(testApi.addCtxWithExistingArg, { b: "foo" }),
     ).toMatchObject({
@@ -770,7 +770,7 @@ describe("zod functions", () => {
   });
 
   test("add args", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.add, {})).toMatchObject({
       argsA: "hi",
     });
@@ -783,14 +783,14 @@ describe("zod functions", () => {
   });
 
   test("consume arg, add to ctx", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.consume, { a: "foo" })).toMatchObject({
       ctxA: "foo",
     });
   });
 
   test("necromance arg", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.necromanceArg, { a: "foo" })).toMatchObject({
       ctxA: "foo",
       argsA: "foo",
@@ -798,7 +798,7 @@ describe("zod functions", () => {
   });
 
   test("pass through arg + ctx", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.passThrough, { a: "foo" })).toMatchObject({
       ctxA: "foo",
       argsA: "foo",
@@ -806,7 +806,7 @@ describe("zod functions", () => {
   });
 
   test("modify arg type", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.modify, { a: "foo" })).toMatchObject({
       ctxA: "foo",
       argsA: 123,
@@ -814,14 +814,14 @@ describe("zod functions", () => {
   });
 
   test("redefine arg", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.redefine, { a: "foo" })).toMatchObject({
       argsA: "foo",
     });
   });
 
   test("refined arg", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.refined, { a: "foo" })).toMatchObject({
       argsA: "foo",
     });
@@ -836,7 +836,7 @@ describe("zod functions", () => {
  */
 
 expectTypeOf(
-  zodToConvexFields({
+  zodToBijectionFields({
     s: z.string().email().max(5),
     n: z.number(),
     nan: z.nan(),
@@ -868,7 +868,7 @@ expectTypeOf(
 });
 
 expectTypeOf(
-  zodToConvexFields({
+  zodToBijectionFields({
     simpleArray: z.array(z.boolean()),
     tuple: z.tuple([z.boolean(), z.boolean()]),
     enum: z.enum(["a", "b"]),
@@ -898,7 +898,7 @@ expectTypeOf(
 });
 
 expectTypeOf(
-  zodToConvexFields({
+  zodToBijectionFields({
     transformed: z.transformer(z.string(), {
       type: "refinement",
       refinement: () => true,
@@ -919,7 +919,7 @@ expectTypeOf(
 });
 // Validate that our double-branded type is correct.
 expectTypeOf(
-  zodToConvexFields({
+  zodToBijectionFields({
     branded2: zBrand(z.string(), "branded2"),
   }),
 ).toEqualTypeOf({
@@ -940,10 +940,10 @@ const ZBrandedObject = z
   .object({ name: z.string(), age: z.number() })
   .brand<"User">();
 const ZBrandedObject2 = z.object({ id: z.string() }).brand("UserId");
-const _vBrandedObject = zodToConvex(ZBrandedObject);
-const _vBrandedObject2 = zodToConvex(ZBrandedObject2);
-const _vBrandedObjectOutput = zodOutputToConvex(ZBrandedObject);
-const _vBrandedObjectOutput2 = zodOutputToConvex(ZBrandedObject2);
+const _vBrandedObject = zodToBijection(ZBrandedObject);
+const _vBrandedObject2 = zodToBijection(ZBrandedObject2);
+const _vBrandedObjectOutput = zodOutputToBijection(ZBrandedObject);
+const _vBrandedObjectOutput2 = zodOutputToBijection(ZBrandedObject2);
 
 // Verify branded objects have the brand in their type
 type _BrandedObjectType = Infer<typeof _vBrandedObject>;
@@ -976,8 +976,8 @@ const ZUser = ZUserBase.extend({
 const ZUser2 = ZUserBase.extend({ role: z.enum(["admin", "user"]) }).brand(
   "User2",
 );
-const _vUser = zodToConvex(ZUser);
-const _vUser2 = zodToConvex(ZUser2);
+const _vUser = zodToBijection(ZUser);
+const _vUser2 = zodToBijection(ZUser2);
 
 type UserType = Infer<typeof _vUser>;
 type User2Type = Infer<typeof _vUser2>;
@@ -1067,26 +1067,26 @@ test("convexToZodFields", () => {
 test("convexToZod round trip", () => {
   const stringValidator = v.string();
   const zodString = convexToZod(stringValidator);
-  const roundTripString = zodToConvex(zodString) as VString;
+  const roundTripString = zodToBijection(zodString) as VString;
   expect(roundTripString.kind).toBe(stringValidator.kind);
 
   type StringType = z.infer<typeof zodString>;
-  type ConvexStringType = Infer<typeof stringValidator>;
-  sameType<StringType, ConvexStringType>(
+  type BijectionStringType = Infer<typeof stringValidator>;
+  sameType<StringType, BijectionStringType>(
     "" as StringType,
-    "" as ConvexStringType,
+    "" as BijectionStringType,
   );
 
   const numberValidator = v.number();
   const zodNumber = convexToZod(numberValidator);
-  const roundTripNumber = zodToConvex(zodNumber) as VFloat64;
+  const roundTripNumber = zodToBijection(zodNumber) as VFloat64;
   expect(roundTripNumber.kind).toBe(numberValidator.kind);
 
   type NumberType = z.infer<typeof zodNumber>;
-  type ConvexNumberType = Infer<typeof numberValidator>;
-  sameType<NumberType, ConvexNumberType>(
+  type BijectionNumberType = Infer<typeof numberValidator>;
+  sameType<NumberType, BijectionNumberType>(
     0 as NumberType,
-    0 as ConvexNumberType,
+    0 as BijectionNumberType,
   );
 
   const objectValidator = v.object({
@@ -1097,24 +1097,24 @@ test("convexToZod round trip", () => {
   });
 
   const zodObject = convexToZod(objectValidator);
-  const roundTripObject = zodToConvex(zodObject) as VObject<any, any>;
+  const roundTripObject = zodToBijection(zodObject) as VObject<any, any>;
   expect(roundTripObject.kind).toBe(objectValidator.kind);
 
   type ObjectType = z.infer<typeof zodObject>;
-  type ConvexObjectType = Infer<typeof objectValidator>;
-  sameType<ObjectType, ConvexObjectType>(
+  type BijectionObjectType = Infer<typeof objectValidator>;
+  sameType<ObjectType, BijectionObjectType>(
     {} as ObjectType,
-    {} as ConvexObjectType,
+    {} as BijectionObjectType,
   );
 
   const idValidator = v.id("users");
   const zodId = convexToZod(idValidator);
-  const roundTripId = zodToConvex(zodId) as VId<"users">;
+  const roundTripId = zodToBijection(zodId) as VId<"users">;
   expect(roundTripId.kind).toBe(idValidator.kind);
 
   type IdType = z.infer<typeof zodId>;
-  type ConvexIdType = Infer<typeof idValidator>;
-  sameType<IdType, ConvexIdType>("" as IdType, "" as ConvexIdType);
+  type BijectionIdType = Infer<typeof idValidator>;
+  sameType<IdType, BijectionIdType>("" as IdType, "" as BijectionIdType);
 });
 
 test("convexToZod validation", () => {
@@ -1188,10 +1188,10 @@ test("convexToZod optional values", () => {
   expect(() => zodOptionalString.parse(123)).toThrow();
 
   type OptionalStringType = z.infer<typeof zodOptionalString>;
-  type ConvexOptionalStringType = Infer<typeof optionalStringValidator>;
-  sameType<OptionalStringType, ConvexOptionalStringType>(
+  type BijectionOptionalStringType = Infer<typeof optionalStringValidator>;
+  sameType<OptionalStringType, BijectionOptionalStringType>(
     "" as OptionalStringType,
-    "" as ConvexOptionalStringType,
+    "" as BijectionOptionalStringType,
   );
   sameType<OptionalStringType, string | undefined>(
     undefined as OptionalStringType,
@@ -1208,10 +1208,10 @@ test("convexToZod optional values", () => {
   expect(() => zodOptionalNumber.parse("hello")).toThrow();
 
   type OptionalNumberType = z.infer<typeof zodOptionalNumber>;
-  type ConvexOptionalNumberType = Infer<typeof optionalNumberValidator>;
-  sameType<OptionalNumberType, ConvexOptionalNumberType>(
+  type BijectionOptionalNumberType = Infer<typeof optionalNumberValidator>;
+  sameType<OptionalNumberType, BijectionOptionalNumberType>(
     0 as OptionalNumberType,
-    0 as ConvexOptionalNumberType,
+    0 as BijectionOptionalNumberType,
   );
 
   const optionalObjectValidator = v.optional(
@@ -1230,10 +1230,10 @@ test("convexToZod optional values", () => {
   expect(() => zodOptionalObject.parse({ name: "John", age: "30" })).toThrow();
 
   type OptionalObjectType = z.infer<typeof zodOptionalObject>;
-  type ConvexOptionalObjectType = Infer<typeof optionalObjectValidator>;
-  sameType<OptionalObjectType, ConvexOptionalObjectType>(
+  type BijectionOptionalObjectType = Infer<typeof optionalObjectValidator>;
+  sameType<OptionalObjectType, BijectionOptionalObjectType>(
     { name: "", age: 0 } as OptionalObjectType,
-    { name: "", age: 0 } as ConvexOptionalObjectType,
+    { name: "", age: 0 } as BijectionOptionalObjectType,
   );
 
   const objectWithOptionalFieldsValidator = v.object({
@@ -1264,17 +1264,17 @@ test("convexToZod optional values", () => {
   type ObjectWithOptionalFieldsType = z.infer<
     typeof zodObjectWithOptionalFields
   >;
-  type ConvexObjectWithOptionalFieldsType = Infer<
+  type BijectionObjectWithOptionalFieldsType = Infer<
     typeof objectWithOptionalFieldsValidator
   >;
-  sameType<ObjectWithOptionalFieldsType, ConvexObjectWithOptionalFieldsType>(
+  sameType<ObjectWithOptionalFieldsType, BijectionObjectWithOptionalFieldsType>(
     { name: "" } as ObjectWithOptionalFieldsType,
-    { name: "" } as ConvexObjectWithOptionalFieldsType,
+    { name: "" } as BijectionObjectWithOptionalFieldsType,
   );
 
   const optionalArrayValidator = v.optional(v.array(v.string()));
   const zodOptionalArray = convexToZod(optionalArrayValidator);
-  const roundTripOptionalArray = zodToConvex(zodOptionalArray) as unknown as {
+  const roundTripOptionalArray = zodToBijection(zodOptionalArray) as unknown as {
     isOptional: string;
   };
 

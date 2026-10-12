@@ -1,4 +1,4 @@
-import { convexTest } from "convex-test";
+import { bijectionTest } from "@bijectionhq/test";
 import { expect, expectTypeOf, test, describe } from "vitest";
 import {
   getOrThrow,
@@ -10,8 +10,8 @@ import {
   getManyVia,
   getManyViaOrThrow,
 } from "./relationships.js";
-import { defineSchema, defineTable, SystemDataModel } from "convex/server";
-import { v } from "convex/values";
+import { defineSchema, defineTable, SystemDataModel } from "bijection/server";
+import { v } from "bijection/values";
 import { modules } from "./setup.test.js";
 
 const schema = defineSchema({
@@ -44,7 +44,7 @@ const schema = defineSchema({
 describe("getOrThrow", () => {
   describe("implicit table name", () => {
     test("gets document", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const userId = await t.run(async (ctx) => {
         return await ctx.db.insert("users", {
@@ -65,7 +65,7 @@ describe("getOrThrow", () => {
     });
 
     test("throws when document not found", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const nonExistentId = await t.run(async (ctx) => {
         const id = await ctx.db.insert("users", {
@@ -86,7 +86,7 @@ describe("getOrThrow", () => {
 
   describe("explicit table name", () => {
     test("gets document", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const userId = await t.run(async (ctx) => {
         return await ctx.db.insert("users", {
@@ -107,7 +107,7 @@ describe("getOrThrow", () => {
     });
 
     test("throws when document not found", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const nonExistentId = await t.run(async (ctx) => {
         const id = await ctx.db.insert("users", {
@@ -126,7 +126,7 @@ describe("getOrThrow", () => {
     });
 
     test("throws when fetching document from wrong table", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const userId = await t.run(async (ctx) => {
         return await ctx.db.insert("users", {
@@ -154,7 +154,7 @@ describe("getOrThrow", () => {
 describe("getAll", () => {
   describe("implicit table name", () => {
     test("gets all documents", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const [userId1, userId2, userId3] = await t.run(async (ctx) => {
         return await Promise.all([
@@ -178,7 +178,7 @@ describe("getAll", () => {
     });
 
     test("returns null for missing documents", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const [validId, deletedId] = await t.run(async (ctx) => {
         const id1 = await ctx.db.insert("users", {
@@ -203,7 +203,7 @@ describe("getAll", () => {
     });
 
     test("handles empty array", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const users = await t.run(async (ctx) => {
         return await getAll(ctx.db, []);
@@ -215,7 +215,7 @@ describe("getAll", () => {
 
   describe("explicit table name", () => {
     test("gets all documents", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const [userId1, userId2, userId3] = await t.run(async (ctx) => {
         return await Promise.all([
@@ -239,7 +239,7 @@ describe("getAll", () => {
     });
 
     test("returns null for missing documents", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const [validId, deletedId] = await t.run(async (ctx) => {
         const id1 = await ctx.db.insert("users", {
@@ -264,7 +264,7 @@ describe("getAll", () => {
     });
 
     test("handles empty array", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const users = await t.run(async (ctx) => {
         return await getAll(ctx.db, "users", []);
@@ -274,7 +274,7 @@ describe("getAll", () => {
     });
 
     test("throws when fetching documents from wrong table", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const userId = await t.run(async (ctx) => {
         return await ctx.db.insert("users", {
@@ -302,7 +302,7 @@ describe("getAll", () => {
 describe("getAllOrThrow", () => {
   describe("implicit table name", () => {
     test("gets all documents", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const [userId1, userId2] = await t.run(async (ctx) => {
         return await Promise.all([
@@ -321,7 +321,7 @@ describe("getAllOrThrow", () => {
     });
 
     test("throws when any document not found", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const [validId, deletedId] = await t.run(async (ctx) => {
         const id1 = await ctx.db.insert("users", {
@@ -344,7 +344,7 @@ describe("getAllOrThrow", () => {
     });
 
     test("handles empty array", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const users = await t.run(async (ctx) => {
         return await getAllOrThrow(ctx.db, []);
@@ -356,7 +356,7 @@ describe("getAllOrThrow", () => {
 
   describe("explicit table name", () => {
     test("gets all documents", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const [userId1, userId2] = await t.run(async (ctx) => {
         return await Promise.all([
@@ -375,7 +375,7 @@ describe("getAllOrThrow", () => {
     });
 
     test("throws when any document not found", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const [validId, deletedId] = await t.run(async (ctx) => {
         const id1 = await ctx.db.insert("users", {
@@ -398,7 +398,7 @@ describe("getAllOrThrow", () => {
     });
 
     test("handles empty array", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const users = await t.run(async (ctx) => {
         return await getAllOrThrow(ctx.db, "users", []);
@@ -408,7 +408,7 @@ describe("getAllOrThrow", () => {
     });
 
     test("throws when a document is not in the right table", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       const userId = await t.run(async (ctx) => {
         return await ctx.db.insert("users", {
@@ -443,7 +443,7 @@ describe("getAllOrThrow", () => {
 
 describe("getOneFrom", () => {
   test("finds document by indexed field", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     await t.run(async (ctx) => {
       await ctx.db.insert("users", {
@@ -463,7 +463,7 @@ describe("getOneFrom", () => {
   });
 
   test("returns null when not found", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const user = await t.run(async (ctx) => {
       return await getOneFrom(
@@ -478,7 +478,7 @@ describe("getOneFrom", () => {
   });
 
   test("uses by_ prefixed index", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     await t.run(async (ctx) => {
       await ctx.db.insert("users", {
@@ -500,7 +500,7 @@ describe("getOneFrom", () => {
 
 describe("getOneFromOrThrow", () => {
   test("finds document by indexed field", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     await t.run(async (ctx) => {
       await ctx.db.insert("users", {
@@ -525,7 +525,7 @@ describe("getOneFromOrThrow", () => {
   });
 
   test("throws when not found", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     await expect(async () => {
       await t.run(async (ctx) => {
@@ -544,7 +544,7 @@ describe("getOneFromOrThrow", () => {
 
 describe("getManyFrom", () => {
   test("finds all documents by indexed field", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const authorId = await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
@@ -574,7 +574,7 @@ describe("getManyFrom", () => {
   });
 
   test("returns empty array when no matches", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const authorId = await t.run(async (ctx) => {
       return await ctx.db.insert("users", {
@@ -593,7 +593,7 @@ describe("getManyFrom", () => {
 
 describe("getManyVia", () => {
   test("finds documents via join table", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const postId = await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
@@ -623,7 +623,7 @@ describe("getManyVia", () => {
   });
 
   test("returns null for missing target documents", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const { postId } = await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
@@ -653,7 +653,7 @@ describe("getManyVia", () => {
   });
 
   test("returns empty array when no join entries", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const postId = await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
@@ -675,7 +675,7 @@ describe("getManyVia", () => {
   });
 
   test("finds system table documents via join table", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const postId = await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
@@ -718,7 +718,7 @@ describe("getManyVia", () => {
   });
 
   test("returns null for missing system table documents", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const postId = await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
@@ -763,7 +763,7 @@ describe("getManyVia", () => {
 
 describe("getManyViaOrThrow", () => {
   test("finds documents via join table", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const postId = await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
@@ -798,7 +798,7 @@ describe("getManyViaOrThrow", () => {
   });
 
   test("throws when target document missing", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const { postId, deletedTagId } = await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
@@ -832,7 +832,7 @@ describe("getManyViaOrThrow", () => {
   });
 
   test("returns empty array when no join entries", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
 
     const postId = await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {

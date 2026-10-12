@@ -1,35 +1,35 @@
-import { ConvexClient } from "convex/browser";
+import { BijectionClient } from "bijection/browser";
 import type {
   FunctionArgs,
   FunctionReference,
   FunctionReference_future,
   FunctionReturnType,
   UserIdentity,
-} from "convex/server";
+} from "bijection/server";
 
 /**
  * This is a helper for testing Convex functions against a locally running backend.
  *
  * An example of calling a function:
  * ```
- * const t = new ConvexTestingHelper();
+ * const t = new BijectionTestingHelper();
  * const result = await t.query(api.foo.bar, { arg1: "baz" })
  * ```
  *
  * An example of calling a function with auth:
  * ```
- * const t = new ConvexTestingHelper();
+ * const t = new BijectionTestingHelper();
  * const identityA = t.newIdentity({ name: "Person A"})
  * const result = await t.withIdentity(identityA).query(api.users.getProfile);
  * ```
  */
-export class ConvexTestingHelper {
+export class BijectionTestingHelper {
   private _nextSubjectId: number = 0;
-  public client: ConvexClient;
+  public client: BijectionClient;
   private _adminKey: string;
 
   constructor(options: { adminKey?: string; backendUrl?: string } = {}) {
-    this.client = new ConvexClient(
+    this.client = new BijectionClient(
       options.backendUrl ?? "http://127.0.0.1:3210",
     );
     this._adminKey =
@@ -53,7 +53,7 @@ export class ConvexTestingHelper {
 
   withIdentity(
     identity: Omit<UserIdentity, "tokenIdentifier">,
-  ): Pick<ConvexClient, "mutation" | "action" | "query"> {
+  ): Pick<BijectionClient, "mutation" | "action" | "query"> {
     return {
       mutation: (functionReference, args) => {
         (this.client as any).setAdminAuth(this._adminKey, identity);

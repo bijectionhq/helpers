@@ -1,0 +1,122 @@
+{
+  "format": 1,
+  "exceptions": [
+    {
+      "id": "ordered-stream-query-bounds",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 811,
+      "end": 812,
+      "replacement_sha256": "4ddc8cfd90c6a75e6cb1d247368bd053f92808587b11d2108c29299b563dd414",
+      "fence": true
+    },
+    {
+      "id": "ordered-stream-query-reflection",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 753,
+      "end": 754,
+      "replacement_sha256": "023b27379204a351dd5d423e5b85c7ce963e7d81e58da800ca88736008dfda4c",
+      "fence": true
+    },
+    {
+      "id": "stream-contract-ordered-stream-query",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 739,
+      "end": 747,
+      "replacement_sha256": "7608926b537756b4235948b9153167a93687a84376411c048f5c289f2b3a2230",
+      "fence": true
+    },
+    {
+      "id": "stream-contract-stream-database-reader",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 554,
+      "end": 557,
+      "replacement_sha256": "334aa2bf248560c12c6c52ad0d3ff355a3225f3cb66ad6227f37775abb9a55ee",
+      "fence": true
+    },
+    {
+      "id": "stream-contract-stream-query",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 690,
+      "end": 698,
+      "replacement_sha256": "617c4b9a06456b94ad1065628594a4d629cb23b423b3e28d7aed0df29bf2ee8c",
+      "fence": true
+    },
+    {
+      "id": "stream-contract-stream-query-initializer",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 622,
+      "end": 629,
+      "replacement_sha256": "e073ef9829a9961318436b0b6934c65997866f347711025aa1d1cbf7668767d9",
+      "fence": true
+    },
+    {
+      "id": "stream-contract-streamable-query",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 610,
+      "end": 619,
+      "replacement_sha256": "55f79356f91c0cd932a2f3f9bbdf7372a58b1c61ab0506409581996b5bbc7dbb",
+      "fence": true
+    },
+    {
+      "id": "stream-query-bounds",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 734,
+      "end": 735,
+      "replacement_sha256": "4ddc8cfd90c6a75e6cb1d247368bd053f92808587b11d2108c29299b563dd414",
+      "fence": true
+    },
+    {
+      "id": "stream-query-initializer-bounds",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 684,
+      "end": 685,
+      "replacement_sha256": "4ddc8cfd90c6a75e6cb1d247368bd053f92808587b11d2108c29299b563dd414",
+      "fence": true
+    },
+    {
+      "id": "stream-query-initializer-iterator",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 672,
+      "end": 673,
+      "replacement_sha256": "debe5a2c0f53323c8d859142cfbbdf7e968afc49abbadba8deab37a09e8b689a",
+      "fence": true
+    },
+    {
+      "id": "stream-query-initializer-reflection",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 669,
+      "end": 670,
+      "replacement_sha256": "46fb2be76e7152aca742148e196e8ad28584941ec3189b453baf53371d8ad64c",
+      "fence": true
+    },
+    {
+      "id": "stream-query-iterator",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 722,
+      "end": 723,
+      "replacement_sha256": "debe5a2c0f53323c8d859142cfbbdf7e968afc49abbadba8deab37a09e8b689a",
+      "fence": true
+    },
+    {
+      "id": "stream-query-reflection",
+      "path": "packages/convex-helpers/server/stream.ts",
+      "upstream_sha256": "59bcb433c200c567cc6e4117ef739e638266b01dc090f80a4dc1792532195b5e",
+      "start": 719,
+      "end": 720,
+      "replacement_sha256": "023b27379204a351dd5d423e5b85c7ce963e7d81e58da800ca88736008dfda4c",
+      "fence": true
+    }
+  ]
+}

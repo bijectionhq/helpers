@@ -4,14 +4,14 @@
  *
  * !Important!: To use these functions, you must wrap your code with
  * ```tsx
- *  <ConvexProvider client={convex}>
+ *  <BijectionProvider client={convex}>
  *    <SessionProvider>
  *      <App />
  *    </SessionProvider>
- *  </ConvexProvider>
+ *  </BijectionProvider>
  * ```
  *
- * With the `SessionProvider` inside the `ConvexProvider` but outside your app.
+ * With the `SessionProvider` inside the `BijectionProvider` but outside your app.
  *
  * See the associated [Stack post](https://stack.convex.dev/track-sessions-without-cookies)
  * for more information.
@@ -30,23 +30,23 @@ import type {
   FunctionReturnType,
   PaginationOptions,
   PaginationResult,
-} from "convex/server";
+} from "bijection/server";
 import {
   useQuery,
   useMutation,
   useAction,
-  ConvexReactClient,
-  type ConvexReactClientOptions,
+  BijectionReactClient,
+  type BijectionReactClientOptions,
   type MutationOptions,
-  useConvex,
+  useBijection,
   type ReactMutation,
   usePaginatedQuery,
   type PaginatedQueryArgs,
   type UsePaginatedQueryReturnType,
-} from "convex/react";
+} from "bijection/react";
 import type { SessionId } from "../server/sessions.js";
 import type { EmptyObject, BetterOmit } from "../index.js";
-import type { OptimisticUpdate } from "convex/browser";
+import type { OptimisticUpdate } from "bijection/browser";
 
 export const DEFAULT_STORAGE_KEY = "convex-session-id";
 
@@ -147,12 +147,12 @@ export const SessionProvider: React.FC<{
     // On the server, crypto may not be defined.
     return (idGenerator ?? crypto.randomUUID.bind(crypto))() as SessionId;
   }
-  const convex = useConvex();
+  const convex = useBijection();
   const initialValue = useMemo(
     () =>
       ssrFriendly
         ? undefined
-        : convex instanceof ConvexReactSessionClient
+        : convex instanceof BijectionReactSessionClient
           ? convex.getSessionId()
           : idGen(),
     [useStorage],
@@ -178,7 +178,7 @@ export const SessionProvider: React.FC<{
     if (!sessionId) {
       const newId = idGen();
       setSessionId(newId);
-      if (convex instanceof ConvexReactSessionClient) {
+      if (convex instanceof BijectionReactSessionClient) {
         convex.setSessionId(newId);
       }
       resolveSessionId(newId);
@@ -427,12 +427,12 @@ interface SessionStorage {
 /**
  * A client wrapper that adds session data to Convex functions.
  *
- * Wraps a ConvexClient and provides methods to automatically inject
+ * Wraps a BijectionClient and provides methods to automatically inject
  * the sessionId parameter into queries, mutations, and actions.
  *
  * Example:
  * ```ts
- * const sessionClient = new ConvexReactSessionClient(address);
+ * const sessionClient = new BijectionReactSessionClient(address);
  *
  * // Use sessionClient instead of client
  * const result = await sessionClient.sessionQuery(
@@ -441,15 +441,15 @@ interface SessionStorage {
  * );
  * ```
  */
-export class ConvexReactSessionClient extends ConvexReactClient {
+export class BijectionReactSessionClient extends BijectionReactClient {
   private sessionId: SessionId;
   private storageKey: string;
   private storage: SessionStorage | null;
 
   /**
-   * Create a new ConvexSessionClient.
+   * Create a new BijectionSessionClient.
    *
-   * @param client The ConvexClient to wrap
+   * @param client The BijectionClient to wrap
    * @param options Optional configuration
    * @param options.sessionId Initial session ID (will generate one if not provided)
    * @param options.storage Storage interface to use (defaults to localStorage if available)
@@ -457,7 +457,7 @@ export class ConvexReactSessionClient extends ConvexReactClient {
    */
   constructor(
     address: string,
-    options?: ConvexReactClientOptions & {
+    options?: BijectionReactClientOptions & {
       sessionId?: SessionId;
       storage?: SessionStorage;
       storageKey?: string;

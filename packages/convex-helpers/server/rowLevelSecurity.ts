@@ -13,8 +13,8 @@ import type {
   TableNamesInDataModel,
   WithOptionalSystemFields,
   WithoutSystemFields,
-} from "convex/server";
-import type { GenericId } from "convex/values";
+} from "bijection/server";
+import type { GenericId } from "bijection/values";
 import { filter } from "./filter.js";
 
 type Rule<Ctx, D> = (ctx: Ctx, doc: D) => Promise<boolean>;
@@ -44,7 +44,7 @@ export type RLSConfig = {
  * Example:
  * ```
  * // Defined in a common file so it can be used by all queries and mutations.
- * import { Auth } from "convex/server";
+ * import { Auth } from "bijection/server";
  * import { DataModel } from "./_generated/dataModel";
  * import { DatabaseReader } from "./_generated/server";
  * import { RowLevelSecurity } from "./rowLevelSecurity";

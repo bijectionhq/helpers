@@ -1,10 +1,10 @@
-import type { GenericDatabaseReader } from "convex/server";
+import type { GenericDatabaseReader } from "bijection/server";
 
-import type { Infer, Validator } from "convex/values";
+import type { Infer, Validator } from "bijection/values";
 
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { validate, ValidationError } from "./validators.js";
-import type { GenericDataModel } from "convex/server";
+import type { GenericDataModel } from "bijection/server";
 
 /**
  * Convert a Convex validator to a Standard Schema.
@@ -28,7 +28,7 @@ export function toStandardSchema<V extends Validator<any, any, any>>(
   return {
     "~standard": {
       version: 1,
-      vendor: "convex-helpers",
+      vendor: "@bijectionhq/helpers",
       validate: (value) => {
         try {
           validate(validator, value, { ...opts, throw: true });

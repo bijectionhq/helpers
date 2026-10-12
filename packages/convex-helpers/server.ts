@@ -8,10 +8,10 @@ import type {
   RegisteredQuery,
   FunctionVisibility,
   PaginationResult,
-} from "convex/server";
-import { defineTable, paginationOptsValidator } from "convex/server";
-import type { GenericId, Infer, ObjectType, Validator } from "convex/values";
-import { v } from "convex/values";
+} from "bijection/server";
+import { defineTable, paginationOptsValidator } from "bijection/server";
+import type { GenericId, Infer, ObjectType, Validator } from "bijection/values";
+import { v } from "bijection/values";
 import type { Expand } from "./index.js";
 import { partial } from "./validators.js";
 
@@ -80,11 +80,11 @@ export function missingEnvVariableError(
 }
 
 /**
- * Get the deployment name from the CONVEX_CLOUD_URL environment variable.
+ * Get the deployment name from the BIJECTION_CLOUD_URL environment variable.
  * @returns The deployment name, like "screaming-lemur-123"
  */
 export function deploymentName() {
-  const url = process.env.CONVEX_CLOUD_URL;
+  const url = process.env.BIJECTION_CLOUD_URL;
   if (!url) return undefined;
   const regex = new RegExp("https://(.+).convex.cloud");
   return regex.exec(url)?.[1];
@@ -96,7 +96,7 @@ export function deploymentName() {
  *
  * ```ts
  * // in convex/users.ts
- * import { crud } from "convex-helpers/server";
+ * import { crud } from "@bijectionhq/helpers/server";
  * import { query, mutation } from "./convex/_generated/server";
  *
  * const Users = Table("users", {
@@ -110,9 +110,9 @@ export function deploymentName() {
  *
  * Then from a client, you can access `api.users.create`.
  *
- * @deprecated Use `import { crud } from "convex-helpers/server/crud";` instead.
+ * @deprecated Use `import { crud } from "@bijectionhq/helpers/server/crud";` instead.
  * @param table The table to create CRUD operations for.
- * Of type returned from Table() in "convex-helpers/server".
+ * Of type returned from Table() in "@bijectionhq/helpers/server".
  * @param query The query to use - use internalQuery or query from
  * "./convex/_generated/server" or a customQuery.
  * @param mutation The mutation to use - use internalMutation or mutation from

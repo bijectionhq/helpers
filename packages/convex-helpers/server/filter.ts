@@ -22,9 +22,9 @@ import type {
   Query,
   SearchFilterBuilder,
   SearchIndexes,
-} from "convex/server";
+} from "bijection/server";
 
-import { SearchFilter } from "convex/server";
+import { SearchFilter } from "bijection/server";
 
 async function asyncFilter<T>(
   arr: T[],

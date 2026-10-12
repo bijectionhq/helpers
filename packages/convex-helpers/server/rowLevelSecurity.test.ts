@@ -1,5 +1,5 @@
-import { convexTest } from "convex-test";
-import { v } from "convex/values";
+import { bijectionTest } from "@bijectionhq/test";
+import { v } from "bijection/values";
 import { describe, expect, test } from "vitest";
 import { wrapDatabaseReader, wrapDatabaseWriter } from "./rowLevelSecurity.js";
 import type {
@@ -7,13 +7,13 @@ import type {
   DataModelFromSchemaDefinition,
   GenericDatabaseWriter,
   MutationBuilder,
-} from "convex/server";
+} from "bijection/server";
 import {
   defineSchema,
   defineTable,
   mutationGeneric,
   queryGeneric,
-} from "convex/server";
+} from "bijection/server";
 import { modules } from "./setup.test.js";
 import { customCtx, customMutation } from "./customFunctions.js";
 import { crud } from "./crud.js";
@@ -56,7 +56,7 @@ const withRLS = async (ctx: { db: DatabaseWriter; auth: Auth }) => {
 
 describe("row level security", () => {
   test("can only read own notes", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       const aId = await ctx.db.insert("users", { tokenIdentifier: "Person A" });
       const bId = await ctx.db.insert("users", { tokenIdentifier: "Person B" });
@@ -86,7 +86,7 @@ describe("row level security", () => {
 
   describe("cannot delete someone else's note", () => {
     test("implicit table names", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const noteId = await t.run(async (ctx) => {
         const aId = await ctx.db.insert("users", {
           tokenIdentifier: "Person A",
@@ -114,7 +114,7 @@ describe("row level security", () => {
     });
 
     test("explicit table names", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const noteId = await t.run(async (ctx) => {
         const aId = await ctx.db.insert("users", {
           tokenIdentifier: "Person A",
@@ -141,7 +141,7 @@ describe("row level security", () => {
   });
 
   test("default allow policy permits access to tables without rules", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
         tokenIdentifier: "Person A",
@@ -182,7 +182,7 @@ describe("row level security", () => {
   });
 
   test("default deny policy blocks access to tables without rules", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", {
         tokenIdentifier: "Person A",
@@ -232,7 +232,7 @@ describe("row level security", () => {
   });
 
   test("default deny policy blocks inserts to tables without rules", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("users", { tokenIdentifier: "Person A" });
     });
@@ -278,7 +278,7 @@ describe("row level security", () => {
 
   describe("default deny policy blocks modifications to tables without rules", () => {
     test("implicit table names", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const docId = await t.run(async (ctx) => {
         await ctx.db.insert("users", { tokenIdentifier: "Person A" });
         return ctx.db.insert("publicData", { content: "Initial content" });
@@ -334,7 +334,7 @@ describe("row level security", () => {
     });
 
     test("explicit table names", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const docId = await t.run(async (ctx) => {
         await ctx.db.insert("users", { tokenIdentifier: "Person A" });
         return ctx.db.insert("publicData", { content: "Initial content" });

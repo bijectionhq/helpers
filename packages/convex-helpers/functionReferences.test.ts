@@ -1,10 +1,10 @@
 import { expectTypeOf, test } from "vitest";
-import type { ConvexClient } from "convex/browser";
+import type { BijectionClient } from "bijection/browser";
 import {
   useQueries as useQueriesCore,
   useQuery as useQueryCore,
   usePaginatedQuery as usePaginatedQueryCore,
-} from "convex/react";
+} from "bijection/react";
 import type {
   FunctionArgs,
   FunctionReference,
@@ -14,7 +14,7 @@ import type {
   PaginationOptions,
   PaginationResult,
   Scheduler,
-} from "convex/server";
+} from "bijection/server";
 import { withArgs } from "./browser.js";
 import {
   makeUseQueryWithStatus,
@@ -27,7 +27,7 @@ import {
   usePaginatedQuery as useCachedPaginatedQuery,
 } from "./react/cache/hooks.js";
 import {
-  ConvexReactSessionClient,
+  BijectionReactSessionClient,
   useSessionQuery,
   useSessionMutation,
   useSessionAction,
@@ -41,7 +41,7 @@ import {
   cancelMigration,
 } from "./server/migrations.js";
 import { makeActionRetrier } from "./server/retries.js";
-import type { ConvexTestingHelper } from "./testing.js";
+import type { BijectionTestingHelper } from "./testing.js";
 
 type Result = { value: string };
 type Query = FunctionReference_future<
@@ -179,7 +179,7 @@ test("client wrappers preserve future reference arguments and results", () => {
   >;
   expectTypeOf(
     (
-      client: ConvexClient,
+      client: BijectionClient,
       query: InjectedQuery,
       mutation: InjectedMutation,
       action: InjectedAction,
@@ -208,7 +208,7 @@ test("client wrappers preserve future reference arguments and results", () => {
   ).toBeFunction();
   expectTypeOf(
     (
-      helper: ConvexTestingHelper,
+      helper: BijectionTestingHelper,
       query: Query,
       mutation: Mutation,
       action: Action,
@@ -266,7 +266,7 @@ test("session wrappers accept future references without losing injected argument
       action: SessionAction,
       onlySession: OnlySession,
       optional: OptionalSessionQuery,
-      client: ConvexReactSessionClient,
+      client: BijectionReactSessionClient,
       ctx: GenericActionCtx<GenericDataModel>,
       sessionId: SessionId,
     ) => {

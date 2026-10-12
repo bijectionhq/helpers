@@ -1,9 +1,9 @@
 import { describe, test, expect, vi, assert } from "vitest";
 import { corsRouter } from "./cors.js";
-import type { GenericActionCtx } from "convex/server";
-import { defineSchema, httpActionGeneric, HttpRouter } from "convex/server";
+import type { GenericActionCtx } from "bijection/server";
+import { defineSchema, httpActionGeneric, HttpRouter } from "bijection/server";
 import { modules } from "./setup.test.js";
-import { convexTest } from "convex-test";
+import { bijectionTest } from "@bijectionhq/test";
 
 describe("corsRouter internals", () => {
   test("configures exact routes correctly", () => {
@@ -217,7 +217,7 @@ describe("corsRouter fetch routes", () => {
     const http = httpModule.replace("cors.test.http", "http");
     const modulesWithHttp = { ...modules, [http]: modules[httpModule]! };
     delete modulesWithHttp[httpModule];
-    return convexTest(defineSchema({}), modulesWithHttp);
+    return bijectionTest(defineSchema({}), modulesWithHttp);
   };
   test("GET /fact", async () => {
     const t = testWithHttp();

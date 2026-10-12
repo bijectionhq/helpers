@@ -1,6 +1,6 @@
 import fs from "fs";
 import { Command, Option } from "commander";
-import type { ValidatorJSON, RecordKeyValidatorJSON } from "convex/values";
+import type { ValidatorJSON, RecordKeyValidatorJSON } from "bijection/values";
 import chalk from "chalk";
 import type { FunctionSpec } from "./utils.js";
 import { getFunctionSpec } from "./utils.js";
@@ -188,8 +188,8 @@ export function generateApiSpec(
     includeInternal ? internalFunctionTree : {},
   );
   return `
-import { type FunctionReference, anyApi } from "convex/server"
-import { type GenericId as Id } from "convex/values"
+import { type FunctionReference, anyApi } from "bijection/server"
+import { type GenericId as Id } from "bijection/values"
 
 export const api: PublicApiType = anyApi as unknown as PublicApiType;
 export const internal: InternalApiType = anyApi as unknown as InternalApiType;

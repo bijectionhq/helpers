@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { toStandardSchema } from "./standardSchema.js";
-import { v } from "convex/values";
+import { v } from "bijection/values";
 import { expectTypeOf } from "vitest";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 
@@ -9,7 +9,7 @@ describe("toStandardSchema", () => {
     const schema = toStandardSchema(v.string());
     expect(schema).toHaveProperty("~standard");
     expect(schema["~standard"]).toHaveProperty("version", 1);
-    expect(schema["~standard"]).toHaveProperty("vendor", "convex-helpers");
+    expect(schema["~standard"]).toHaveProperty("vendor", "@bijectionhq/helpers");
     expect(typeof schema["~standard"].validate).toBe("function");
   });
 

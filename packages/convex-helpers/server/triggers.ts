@@ -9,8 +9,8 @@ import type {
   TableNamesInDataModel,
   WithOptionalSystemFields,
   WithoutSystemFields,
-} from "convex/server";
-import type { GenericId } from "convex/values";
+} from "bijection/server";
+import type { GenericId } from "bijection/values";
 
 /**
  * This function will be called when a document in the table changes.
@@ -54,8 +54,8 @@ export type Change<
  * ```
  * import { mutation as rawMutation } from "./_generated/server";
  * import { DataModel } from "./_generated/dataModel";
- * import { Triggers } from "convex-helpers/server/triggers";
- * import { customCtx, customMutation } from "convex-helpers/server/customFunctions";
+ * import { Triggers } from "@bijectionhq/helpers/server/triggers";
+ * import { customCtx, customMutation } from "@bijectionhq/helpers/server/customFunctions";
  *
  * const triggers = new Triggers<DataModel>();
  * triggers.register("myTableName", async (ctx, change) => {

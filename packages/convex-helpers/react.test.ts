@@ -2,14 +2,14 @@
 import { cleanup, renderHook } from "@testing-library/react";
 import { createElement, type ReactNode } from "react";
 import { afterEach, expect, expectTypeOf, test, vi } from "vitest";
-import { ConvexProvider, type ConvexReactClient } from "convex/react";
+import { BijectionProvider, type BijectionReactClient } from "bijection/react";
 import {
   makeFunctionReference,
   type FunctionReference_future,
-} from "convex/server";
+} from "bijection/server";
 import { makeUseQueryWithStatus } from "./react.js";
 import { useQuery, useQueries } from "./react/cache/hooks.js";
-import { ConvexQueryCacheProvider } from "./react/cache/provider.js";
+import { BijectionQueryCacheProvider } from "./react/cache/provider.js";
 
 afterEach(cleanup);
 
@@ -33,12 +33,12 @@ function setup(value: string | undefined | Error) {
     onUpdate: () => unsubscribe,
     journal: () => undefined,
   }));
-  const client = { watchQuery } as unknown as ConvexReactClient;
+  const client = { watchQuery } as unknown as BijectionReactClient;
   const wrapper = ({ children }: { children: ReactNode }) =>
     createElement(
-      ConvexProvider,
+      BijectionProvider,
       { client },
-      createElement(ConvexQueryCacheProvider, { maxIdleEntries: 0 }, children),
+      createElement(BijectionQueryCacheProvider, { maxIdleEntries: 0 }, children),
     );
   return { wrapper, watchQuery, unsubscribe };
 }

@@ -7,11 +7,11 @@ import {
   expect,
   beforeEach,
 } from "vitest";
-import type { FunctionReference } from "convex/server";
+import type { FunctionReference } from "bijection/server";
 import type { SessionArgsArray, SessionQueryArgsArray } from "./sessions.js";
 import type { EmptyObject } from "../index.js";
 import type { SessionId } from "../server/sessions.js";
-import { ConvexReactSessionClient } from "./sessions.js";
+import { BijectionReactSessionClient } from "./sessions.js";
 
 test("noop", () => {});
 
@@ -88,9 +88,9 @@ expectTypeOf<
   >
 >().toEqualTypeOf<[args?: EmptyObject | undefined]>();
 
-describe("ConvexSessionClient", () => {
+describe("BijectionSessionClient", () => {
   let mockClient: { query: any; mutation: any; action: any };
-  let sessionClient: ConvexReactSessionClient;
+  let sessionClient: BijectionReactSessionClient;
   const sessionId = "test-session-id" as SessionId;
 
   beforeEach(() => {
@@ -99,7 +99,7 @@ describe("ConvexSessionClient", () => {
       mutation: vi.fn().mockResolvedValue("mutation-result"),
       action: vi.fn().mockResolvedValue("action-result"),
     };
-    sessionClient = new ConvexReactSessionClient("http://localhost:3000", {
+    sessionClient = new BijectionReactSessionClient("http://localhost:3000", {
       sessionId,
     });
     sessionClient.query = mockClient.query;

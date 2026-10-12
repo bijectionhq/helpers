@@ -1,5 +1,5 @@
-import { defineTable, defineSchema } from "convex/server";
-import { convexTest } from "convex-test";
+import { defineTable, defineSchema } from "bijection/server";
+import { bijectionTest } from "@bijectionhq/test";
 import { expect, test, vi } from "vitest";
 import type { RateLimitConfig, RateLimitError } from "./rateLimit.js";
 import {
@@ -11,7 +11,7 @@ import {
   isRateLimitError,
 } from "./rateLimit.js";
 import { modules } from "./setup.test.js";
-import { ConvexError } from "convex/values";
+import { BijectionError } from "bijection/values";
 
 const schema = defineSchema({
   foo: defineTable({}),
@@ -25,14 +25,14 @@ const Hour = 60 * Minute;
 test("isRateLimitError", () => {
   expect(
     isRateLimitError(
-      new ConvexError({
+      new BijectionError({
         kind: "RateLimited",
         name: "foo",
         retryAt: 1,
       } as RateLimitError),
     ),
   ).toBe(true);
-  expect(isRateLimitError(new ConvexError({ kind: "foo" }))).toBe(false);
+  expect(isRateLimitError(new BijectionError({ kind: "foo" }))).toBe(false);
 });
 
 describe.each(["token bucket", "fixed window"] as const)(
@@ -45,7 +45,7 @@ describe.each(["token bucket", "fixed window"] as const)(
       vi.useRealTimers();
     });
     test("simple check", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { checkRateLimit, rateLimit } = defineRateLimits({
         simple: { kind, rate: 1, period: Second },
       });
@@ -63,7 +63,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("simple consume", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit } = defineRateLimits({
         simple: { kind, rate: 1, period: Second },
       });
@@ -80,7 +80,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("consume too much", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       await expect(() =>
         t.run(async (ctx) => {
           await rateLimit(ctx, {
@@ -97,7 +97,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("keyed", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit } = defineRateLimits({
         simple: { kind, rate: 1, period: Second },
       });
@@ -114,7 +114,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("burst", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit } = defineRateLimits({
         burst: { kind, rate: 1, period: Second, capacity: 3 },
       });
@@ -135,7 +135,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("simple reset", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit, resetRateLimit } = defineRateLimits({
         simple: { kind, rate: 1, period: Second },
       });
@@ -151,7 +151,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("keyed reset", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit, resetRateLimit } = defineRateLimits({
         simple: { kind, rate: 1, period: Second },
       });
@@ -167,7 +167,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("reserved without max", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit, checkRateLimit } = defineRateLimits({
         res: { kind, rate: 1, period: Hour },
       });
@@ -189,7 +189,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("reserved with max", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit, checkRateLimit } = defineRateLimits({
         res: {
           kind,
@@ -218,7 +218,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("consume too much reserved", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       await expect(() =>
         t.run(async (ctx) => {
           await rateLimit(ctx, {
@@ -237,7 +237,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("throws", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit } = defineRateLimits({
         simple: { kind, rate: 1, period: Second },
       });
@@ -250,7 +250,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("retryAt is accurate", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit } = defineRateLimits({
         simple: { kind, rate: 10, period: Minute },
       });
@@ -303,7 +303,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("retryAt for reserved is accurate", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit } = defineRateLimits({
         simple: { kind, rate: 10, period: Minute },
       });
@@ -374,7 +374,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("inline config", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const { rateLimit, checkRateLimit, resetRateLimit } = defineRateLimits(
         {},
       );
@@ -398,7 +398,7 @@ describe.each(["token bucket", "fixed window"] as const)(
     });
 
     test("inline vanilla", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const config = {
         kind,
         rate: 1,

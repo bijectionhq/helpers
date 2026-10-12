@@ -3,15 +3,15 @@ import type {
   PaginatedQueryArgs,
   PaginatedQueryReference,
   UsePaginatedQueryReturnType,
-} from "convex/react";
-import { ConvexError } from "convex/values";
-import { convexToJson } from "convex/values";
+} from "bijection/react";
+import { BijectionError } from "bijection/values";
+import { bijectionToJson } from "bijection/values";
 import {
-  useConvex,
+  useBijection,
   useQueries,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   useQuery as useQueryOriginal,
-} from "convex/react";
+} from "bijection/react";
 import type {
   FunctionReference,
   FunctionReference_future,
@@ -19,21 +19,21 @@ import type {
   PaginationOptions,
   paginationOptsValidator,
   PaginationResult,
-} from "convex/server";
-import type { Infer } from "convex/values";
-import { getFunctionName } from "convex/server";
+} from "bijection/server";
+import type { Infer } from "bijection/values";
+import { getFunctionName } from "bijection/server";
 import { useMemo, useState } from "react";
 import type { EmptyObject } from "./index.js";
-import type { Value } from "convex/values";
+import type { Value } from "bijection/values";
 
 /**
- * Use in place of `useQuery` from "convex/react" to fetch data from a query
+ * Use in place of `useQuery` from "bijection/react" to fetch data from a query
  * function but instead returns `{ status, data, error, isSuccess, isPending, isError}`.
  *
  * Want a different name? Use `makeUseQueryWithStatus` to create a custom hook:
  * ```ts
- * import { useQueries } from "convex/react";
- * import { makeUseQueryWithStatus } from "convex-helpers/react";
+ * import { useQueries } from "bijection/react";
+ * import { makeUseQueryWithStatus } from "@bijectionhq/helpers/react";
  * export const useQuery = makeUseQueryWithStatus(useQueries);
  * ```
  *
@@ -45,7 +45,7 @@ import type { Value } from "convex/values";
  * This React hook contains internal state that will cause a rerender
  * whenever the query result changes.
  *
- * Throws an error if not used under {@link ConvexProvider}.
+ * Throws an error if not used under {@link BijectionProvider}.
  *
  * @param query - a {@link server.FunctionReference} for the public query to run
  * like `api.dir1.dir2.filename.func`.
@@ -62,15 +62,15 @@ import type { Value } from "convex/values";
 export const useQuery = makeUseQueryWithStatus(useQueries);
 
 /**
- * Makes a hook to use in place of `useQuery` from "convex/react" to fetch data from a query
+ * Makes a hook to use in place of `useQuery` from "bijection/react" to fetch data from a query
  * function but instead returns `{ status, data, error, isSuccess, isPending, isError}`.
  *
- * You can pass in any hook that matches the signature of {@link useQueries} from "convex/react".
+ * You can pass in any hook that matches the signature of {@link useQueries} from "bijection/react".
  * For instance:
  *
  * ```ts
- * import { useQueries } from "convex-helpers/react/cache/hooks";
- * import { makeUseQueryWithStatus } from "convex-helpers/react";
+ * import { useQueries } from "@bijectionhq/helpers/react/cache/hooks";
+ * import { makeUseQueryWithStatus } from "@bijectionhq/helpers/react";
  * const useQuery = makeUseQueryWithStatus(useQueries);
  * ```
  *
@@ -82,7 +82,7 @@ export const useQuery = makeUseQueryWithStatus(useQueries);
  * This React hook contains internal state that will cause a rerender
  * whenever the query result changes.
  *
- * Throws an error if not used under {@link ConvexProvider}.
+ * Throws an error if not used under {@link BijectionProvider}.
  *
  * @param query - a {@link server.FunctionReference} for the public query to run
  * like `api.dir1.dir2.filename.func`.
@@ -96,7 +96,7 @@ export const useQuery = makeUseQueryWithStatus(useQueries);
  * - `isPending` is `true` if the query is still loading or "skip" was passed.
  * - `isError` is `true` if the query threw an exception.
  *
- * @param useQueries Something matching the signature of {@link useQueries} from "convex/react".
+ * @param useQueries Something matching the signature of {@link useQueries} from "bijection/react".
  * @returns
  * @returns A useQuery function that returns an object with status, data, error, isSuccess, isPending, isError.
  */
@@ -143,7 +143,7 @@ export function makeUseQueryWithStatus(useQueriesHook: typeof useQueries) {
           args,
         },
       };
-    }, [getFunctionName(query), JSON.stringify(convexToJson(args))]);
+    }, [getFunctionName(query), JSON.stringify(bijectionToJson(args))]);
     const result = useQueriesHook(queries);
     if (args === "skip") {
       return {
@@ -254,7 +254,7 @@ export function usePaginatedQuery<Query extends PaginatedQueryReference>(
     // we want to avoid rerendering if the args are a different
     // object that serializes to the same result.
   }, [
-    JSON.stringify(convexToJson(argsObject as Value)),
+    JSON.stringify(bijectionToJson(argsObject as Value)),
     queryName,
     options.initialNumItems,
     skip,
@@ -268,13 +268,13 @@ export function usePaginatedQuery<Query extends PaginatedQueryReference>(
   if (
     skip !== state.skip ||
     getFunctionName(query) !== getFunctionName(state.query) ||
-    JSON.stringify(convexToJson(argsObject as Value)) !==
-      JSON.stringify(convexToJson(state.args))
+    JSON.stringify(bijectionToJson(argsObject as Value)) !==
+      JSON.stringify(bijectionToJson(state.args))
   ) {
     currState = createInitialState();
     setState(currState);
   }
-  const convexClient = useConvex();
+  const convexClient = useBijection();
   const logger = convexClient.logger;
 
   const resultsObject = useQueries(currState.queries);
@@ -295,7 +295,7 @@ export function usePaginatedQuery<Query extends PaginatedQueryReference>(
       if (currResult instanceof Error) {
         if (
           currResult.message.includes("InvalidCursor") ||
-          (currResult instanceof ConvexError &&
+          (currResult instanceof BijectionError &&
             typeof currResult.data === "object" &&
             currResult.data?.isConvexSystemError === true &&
             currResult.data?.paginationError === "InvalidCursor")

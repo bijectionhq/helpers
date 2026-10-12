@@ -1,0 +1,566 @@
+{
+  "format": 2,
+  "upstream": "d9dedf7a83259aa677a390a3e50a641218d10170",
+  "roots": [
+    "packages/convex-helpers/",
+    "tools/concave/",
+    "scripts/",
+    "AGENTS.md",
+    "scripts/check_agent_mirror.py"
+  ],
+  "families": [
+    {
+      "id": "component",
+      "title": "@bijectionhq/helpers",
+      "paths": [
+        "packages/convex-helpers/"
+      ]
+    },
+    {
+      "id": "repository",
+      "title": "Preserved upstream and maintenance owners",
+      "paths": [
+        ".agents/",
+        ".claude/",
+        ".cursor/",
+        ".github/",
+        ".gitignore",
+        ".npmrc",
+        ".nvmrc",
+        ".prettierignore",
+        ".prettierrc",
+        ".vscode/",
+        "AGENTS.md",
+        "BIJECTION.md",
+        "CLAUDE.md",
+        "CONTRIBUTING.md",
+        "Justfile",
+        "LICENSE",
+        "README.md",
+        "backendHarness.js",
+        "concave.json",
+        "convex.sh",
+        "convex/",
+        "eslint.config.mjs",
+        "index.html",
+        "package-lock.json",
+        "package.json",
+        "packages/",
+        "publish.sh",
+        "renovate.json",
+        "scripts/",
+        "skills-lock.json",
+        "src/",
+        "test-http-routes.mjs",
+        "tools/",
+        "tsconfig.json",
+        "vite.config.mts",
+        "MAINTAINING.md"
+      ]
+    }
+  ],
+  "preserve_exactly": [
+    "LICENSE"
+  ],
+  "cases": {},
+  "boundaries": [
+    "concave.json",
+    "scripts/land.py",
+    "tools/concave-source.json"
+  ],
+  "writer": [
+    "python3",
+    "scripts/land.py",
+    "--edit",
+    "--"
+  ],
+  "transforms": [
+    {
+      "id": "sdk-module-identity",
+      "paths": [
+        "packages/convex-helpers/browser.test.ts",
+        "packages/convex-helpers/browser.ts",
+        "packages/convex-helpers/cli/functions.test.ts",
+        "packages/convex-helpers/cli/index.ts",
+        "packages/convex-helpers/cli/openApiSpec.ts",
+        "packages/convex-helpers/cli/tsApiSpec.ts",
+        "packages/convex-helpers/cli/utils.ts",
+        "packages/convex-helpers/functionReferences.test.ts",
+        "packages/convex-helpers/index.test.ts",
+        "packages/convex-helpers/react.test.ts",
+        "packages/convex-helpers/react.ts",
+        "packages/convex-helpers/react/cache/hooks.ts",
+        "packages/convex-helpers/react/cache/provider.tsx",
+        "packages/convex-helpers/react/sessions.test.ts",
+        "packages/convex-helpers/react/sessions.ts",
+        "packages/convex-helpers/server.ts",
+        "packages/convex-helpers/server/compare.ts",
+        "packages/convex-helpers/server/cors.test.http.ts",
+        "packages/convex-helpers/server/cors.test.ts",
+        "packages/convex-helpers/server/cors.ts",
+        "packages/convex-helpers/server/crud.test.ts",
+        "packages/convex-helpers/server/crud.ts",
+        "packages/convex-helpers/server/customFunctions.test.ts",
+        "packages/convex-helpers/server/customFunctions.ts",
+        "packages/convex-helpers/server/filter.test.ts",
+        "packages/convex-helpers/server/filter.ts",
+        "packages/convex-helpers/server/hono.ts",
+        "packages/convex-helpers/server/migrations.ts",
+        "packages/convex-helpers/server/pagination.test.ts",
+        "packages/convex-helpers/server/pagination.ts",
+        "packages/convex-helpers/server/rateLimit.test.ts",
+        "packages/convex-helpers/server/rateLimit.ts",
+        "packages/convex-helpers/server/relationships.test.ts",
+        "packages/convex-helpers/server/relationships.ts",
+        "packages/convex-helpers/server/retries.ts",
+        "packages/convex-helpers/server/rowLevelSecurity.test.ts",
+        "packages/convex-helpers/server/rowLevelSecurity.ts",
+        "packages/convex-helpers/server/sessions.ts",
+        "packages/convex-helpers/server/stream.flatmap.test.ts",
+        "packages/convex-helpers/server/stream.test.ts",
+        "packages/convex-helpers/server/stream.ts",
+        "packages/convex-helpers/server/table.test.ts",
+        "packages/convex-helpers/server/triggers.test.ts",
+        "packages/convex-helpers/server/triggers.ts",
+        "packages/convex-helpers/server/validators.test.ts",
+        "packages/convex-helpers/server/zod.test.ts",
+        "packages/convex-helpers/server/zod.ts",
+        "packages/convex-helpers/server/zod3.test.ts",
+        "packages/convex-helpers/server/zod3.ts",
+        "packages/convex-helpers/server/zod4.convextozod.test.ts",
+        "packages/convex-helpers/server/zod4.functions.test.ts",
+        "packages/convex-helpers/server/zod4.ts",
+        "packages/convex-helpers/server/zod4.zod3.test.ts",
+        "packages/convex-helpers/server/zod4.zodtoconvex.mini.test.ts",
+        "packages/convex-helpers/server/zod4.zodtoconvex.test.ts",
+        "packages/convex-helpers/standardSchema.test.ts",
+        "packages/convex-helpers/standardSchema.ts",
+        "packages/convex-helpers/testing.ts",
+        "packages/convex-helpers/validators.test.ts",
+        "packages/convex-helpers/validators.ts",
+        "packages/convex-helpers/react/cache.ts"
+      ],
+      "tokens": {
+        "rules": [
+          {
+            "from": "\"convex/",
+            "to": "\"bijection/"
+          },
+          {
+            "from": "'convex/",
+            "to": "'bijection/"
+          },
+          {
+            "from": "\"convex\"",
+            "to": "\"bijection\""
+          },
+          {
+            "from": "\"convex-helpers",
+            "to": "\"@bijectionhq/helpers"
+          },
+          {
+            "from": "\"convex-test\"",
+            "to": "\"@bijectionhq/test\""
+          },
+          {
+            "from": "\"@convex-dev/agent",
+            "to": "\"@bijectionhq/agents"
+          },
+          {
+            "from": "HonoWithConvex",
+            "to": "HonoWithBijection"
+          },
+          {
+            "from": "IsConvexUnencodableType",
+            "to": "IsBijectionUnencodableType"
+          },
+          {
+            "from": "TConvexNestedObject",
+            "to": "TBijectionNestedObject"
+          },
+          {
+            "from": "TConvexSimpleObject",
+            "to": "TBijectionSimpleObject"
+          },
+          {
+            "from": "ZodShapeFromConvexObject",
+            "to": "ZodShapeFromBijectionObject"
+          },
+          {
+            "from": "ZodValidatorFromConvex",
+            "to": "ZodValidatorFromBijection"
+          },
+          {
+            "from": "ZodValidatorFromConvex3",
+            "to": "ZodValidatorFromBijection3"
+          },
+          {
+            "from": "_asConvex",
+            "to": "_asBijection"
+          },
+          {
+            "from": "convexTest",
+            "to": "bijectionTest"
+          },
+          {
+            "from": "convexToJson",
+            "to": "bijectionToJson"
+          },
+          {
+            "from": "jsonToConvex",
+            "to": "jsonToBijection"
+          },
+          {
+            "from": "skipConvexValidation",
+            "to": "skipBijectionValidation"
+          },
+          {
+            "from": "testConvexToZod",
+            "to": "testBijectionToZod"
+          },
+          {
+            "from": "testQueryWithSkipConvexValidation",
+            "to": "testQueryWithSkipBijectionValidation"
+          },
+          {
+            "from": "testZodOutputToConvex",
+            "to": "testZodOutputToBijection"
+          },
+          {
+            "from": "testZodToConvex",
+            "to": "testZodToBijection"
+          },
+          {
+            "from": "testZodToConvexInputAndOutput",
+            "to": "testZodToBijectionInputAndOutput"
+          },
+          {
+            "from": "toConvex",
+            "to": "toBijection"
+          },
+          {
+            "from": "useConvex",
+            "to": "useBijection"
+          },
+          {
+            "from": "zodOutputToConvex",
+            "to": "zodOutputToBijection"
+          },
+          {
+            "from": "zodOutputToConvex3",
+            "to": "zodOutputToBijection3"
+          },
+          {
+            "from": "zodOutputToConvex4",
+            "to": "zodOutputToBijection4"
+          },
+          {
+            "from": "zodOutputToConvexFields",
+            "to": "zodOutputToBijectionFields"
+          },
+          {
+            "from": "zodOutputToConvexInner",
+            "to": "zodOutputToBijectionInner"
+          },
+          {
+            "from": "zodToConvex",
+            "to": "zodToBijection"
+          },
+          {
+            "from": "zodToConvex3",
+            "to": "zodToBijection3"
+          },
+          {
+            "from": "zodToConvex4",
+            "to": "zodToBijection4"
+          },
+          {
+            "from": "zodToConvexCommon",
+            "to": "zodToBijectionCommon"
+          },
+          {
+            "from": "zodToConvexFields",
+            "to": "zodToBijectionFields"
+          },
+          {
+            "from": "zodToConvexInner",
+            "to": "zodToBijectionInner"
+          },
+          {
+            "from": "ConvexClient",
+            "to": "BijectionClient"
+          },
+          {
+            "from": "CONVEX_URL",
+            "to": "BIJECTION_URL"
+          },
+          {
+            "from": "ConvexHttpClient",
+            "to": "BijectionHttpClient"
+          },
+          {
+            "from": "ConvexReactSessionClient",
+            "to": "BijectionReactSessionClient"
+          },
+          {
+            "from": "ConvexTestingHelper",
+            "to": "BijectionTestingHelper"
+          },
+          {
+            "from": "ConvexReactClient",
+            "to": "BijectionReactClient"
+          },
+          {
+            "from": "ConvexProvider",
+            "to": "BijectionProvider"
+          },
+          {
+            "from": "ConvexQueryCacheProvider",
+            "to": "BijectionQueryCacheProvider"
+          },
+          {
+            "from": "ConvexError",
+            "to": "BijectionError"
+          },
+          {
+            "from": "ConvexQueryCacheContext",
+            "to": "BijectionQueryCacheContext"
+          },
+          {
+            "from": "ConvexQueryCacheOptions",
+            "to": "BijectionQueryCacheOptions"
+          },
+          {
+            "from": "ConvexSessionClient",
+            "to": "BijectionSessionClient"
+          },
+          {
+            "from": "ConvexReactClientOptions",
+            "to": "BijectionReactClientOptions"
+          },
+          {
+            "from": "CONVEX_CLOUD_URL",
+            "to": "BIJECTION_CLOUD_URL"
+          },
+          {
+            "from": "ConvexValidatorFromZod4",
+            "to": "BijectionValidatorFromZod4"
+          },
+          {
+            "from": "ConvexToZod",
+            "to": "BijectionToZod"
+          },
+          {
+            "from": "ConvexValidatorFromZod3",
+            "to": "BijectionValidatorFromZod3"
+          },
+          {
+            "from": "ConvexValidatorFromZod",
+            "to": "BijectionValidatorFromZod"
+          },
+          {
+            "from": "ConvexToZod3",
+            "to": "BijectionToZod3"
+          },
+          {
+            "from": "ConvexValidatorFromZodOutput4",
+            "to": "BijectionValidatorFromZodOutput4"
+          },
+          {
+            "from": "ConvexValidatorFromZodOutput",
+            "to": "BijectionValidatorFromZodOutput"
+          },
+          {
+            "from": "ConvexValidatorFromZodOutput3",
+            "to": "BijectionValidatorFromZodOutput3"
+          },
+          {
+            "from": "ConvexIdType",
+            "to": "BijectionIdType"
+          },
+          {
+            "from": "ConvexObjectType",
+            "to": "BijectionObjectType"
+          },
+          {
+            "from": "ConvexOptionalNumberType",
+            "to": "BijectionOptionalNumberType"
+          },
+          {
+            "from": "ConvexObjectWithOptionalFieldsType",
+            "to": "BijectionObjectWithOptionalFieldsType"
+          },
+          {
+            "from": "ConvexNumberType",
+            "to": "BijectionNumberType"
+          },
+          {
+            "from": "ConvexStringType",
+            "to": "BijectionStringType"
+          },
+          {
+            "from": "ConvexOptionalStringType",
+            "to": "BijectionOptionalStringType"
+          },
+          {
+            "from": "ConvexOptionalObjectType",
+            "to": "BijectionOptionalObjectType"
+          },
+          {
+            "from": "ConvexId",
+            "to": "BijectionId"
+          },
+          {
+            "from": "ConvexUnionValidatorFromZodOutput",
+            "to": "BijectionUnionValidatorFromZodOutput"
+          },
+          {
+            "from": "ConvexObjectValidatorFromZod",
+            "to": "BijectionObjectValidatorFromZod"
+          },
+          {
+            "from": "ConvexUnionValidatorFromZod",
+            "to": "BijectionUnionValidatorFromZod"
+          },
+          {
+            "from": "ConvexObjectValidatorFromZodOutput",
+            "to": "BijectionObjectValidatorFromZodOutput"
+          },
+          {
+            "from": "ConvexValidatorFromZodCommon",
+            "to": "BijectionValidatorFromZodCommon"
+          },
+          {
+            "from": "ConvexValidatorFromZodRecord",
+            "to": "BijectionValidatorFromZodRecord"
+          },
+          {
+            "from": "ConvexUnionValidatorFromZodMembers",
+            "to": "BijectionUnionValidatorFromZodMembers"
+          },
+          {
+            "from": "ConvexLiteralFromZod",
+            "to": "BijectionLiteralFromZod"
+          },
+          {
+            "from": "ConvexObjectValidatorFromRecord",
+            "to": "BijectionObjectValidatorFromRecord"
+          },
+          {
+            "from": "ConvexValidatorFromZodSide",
+            "to": "BijectionValidatorFromZodSide"
+          },
+          {
+            "from": "ConvexObjectFromZodShape",
+            "to": "BijectionObjectFromZodShape"
+          }
+        ],
+        "except": [
+          "Symbol.for(\"ConvexError\")"
+        ]
+      },
+      "explanation": {
+        "why": "Resolve every component and React hook to the same Bijection SDK while preserving inherited marker, value and function contracts.",
+        "witnesses": [
+          "BIJECTION.md"
+        ]
+      }
+    },
+    {
+      "id": "package-assembly",
+      "paths": [
+        "packages/convex-helpers/package.json"
+      ],
+      "replacements": [
+        {
+          "from": "{\n  \"name\": \"convex-helpers\",\n  \"version\": \"0.1.128\",\n  \"description\": \"A collection of useful code to complement the official convex package.\",\n  \"type\": \"module\",\n  \"bin\": {\n    \"convex-helpers\": \"bin.cjs\"\n  },\n  \"exports\": {\n    \".\": {\n      \"types\": \"./index.d.ts\",\n      \"default\": \"./index.js\"\n    },\n    \"./browser\": {\n      \"types\": \"./browser.d.ts\",\n      \"default\": \"./browser.js\"\n    },\n    \"./testing\": {\n      \"types\": \"./testing.d.ts\",\n      \"default\": \"./testing.js\"\n    },\n    \"./validators\": {\n      \"types\": \"./validators.d.ts\",\n      \"default\": \"./validators.js\"\n    },\n    \"./server\": {\n      \"types\": \"./server.d.ts\",\n      \"default\": \"./server.js\"\n    },\n    \"./standardSchema\": {\n      \"types\": \"./standardSchema.d.ts\",\n      \"default\": \"./standardSchema.js\"\n    },\n    \"./react\": {\n      \"types\": \"./react.d.ts\",\n      \"default\": \"./react.js\"\n    },\n    \"./react/cache\": {\n      \"types\": \"./react/cache.d.ts\",\n      \"default\": \"./react/cache.js\"\n    },\n    \"./react/sessions\": {\n      \"types\": \"./react/sessions.d.ts\",\n      \"default\": \"./react/sessions.js\"\n    },\n    \"./react/cache/hooks\": {\n      \"types\": \"./react/cache/hooks.d.ts\",\n      \"default\": \"./react/cache/hooks.js\"\n    },\n    \"./react/cache/provider\": {\n      \"types\": \"./react/cache/provider.d.ts\",\n      \"default\": \"./react/cache/provider.js\"\n    },\n    \"./server/compare\": {\n      \"types\": \"./server/compare.d.ts\",\n      \"default\": \"./server/compare.js\"\n    },\n    \"./server/cors\": {\n      \"types\": \"./server/cors.d.ts\",\n      \"default\": \"./server/cors.js\"\n    },\n    \"./server/crud\": {\n      \"types\": \"./server/crud.d.ts\",\n      \"default\": \"./server/crud.js\"\n    },\n    \"./server/customFunctions\": {\n      \"types\": \"./server/customFunctions.d.ts\",\n      \"default\": \"./server/customFunctions.js\"\n    },\n    \"./server/filter\": {\n      \"types\": \"./server/filter.d.ts\",\n      \"default\": \"./server/filter.js\"\n    },\n    \"./server/hono\": {\n      \"types\": \"./server/hono.d.ts\",\n      \"default\": \"./server/hono.js\"\n    },\n    \"./server/migrations\": {\n      \"types\": \"./server/migrations.d.ts\",\n      \"default\": \"./server/migrations.js\"\n    },\n    \"./server/pagination\": {\n      \"types\": \"./server/pagination.d.ts\",\n      \"default\": \"./server/pagination.js\"\n    },\n    \"./server/rateLimit\": {\n      \"types\": \"./server/rateLimit.d.ts\",\n      \"default\": \"./server/rateLimit.js\"\n    },\n    \"./server/relationships\": {\n      \"types\": \"./server/relationships.d.ts\",\n      \"default\": \"./server/relationships.js\"\n    },\n    \"./server/retries\": {\n      \"types\": \"./server/retries.d.ts\",\n      \"default\": \"./server/retries.js\"\n    },\n    \"./server/rowLevelSecurity\": {\n      \"types\": \"./server/rowLevelSecurity.d.ts\",\n      \"default\": \"./server/rowLevelSecurity.js\"\n    },\n    \"./server/sessions\": {\n      \"types\": \"./server/sessions.d.ts\",\n      \"default\": \"./server/sessions.js\"\n    },\n    \"./server/stream\": {\n      \"types\": \"./server/stream.d.ts\",\n      \"default\": \"./server/stream.js\"\n    },\n    \"./server/triggers\": {\n      \"types\": \"./server/triggers.d.ts\",\n      \"default\": \"./server/triggers.js\"\n    },\n    \"./server/zod\": {\n      \"types\": \"./server/zod.d.ts\",\n      \"default\": \"./server/zod.js\"\n    },\n    \"./server/zod3\": {\n      \"types\": \"./server/zod3.d.ts\",\n      \"default\": \"./server/zod3.js\"\n    },\n    \"./server/zod4\": {\n      \"types\": \"./server/zod4.d.ts\",\n      \"default\": \"./server/zod4.js\"\n    },\n    \"./react/*\": {\n      \"types\": \"./react/*.d.ts\",\n      \"default\": \"./react/*.js\"\n    },\n    \"./react/cache/*\": {\n      \"types\": \"./react/cache/*.d.ts\",\n      \"default\": \"./react/cache/*.js\"\n    },\n    \"./server/*\": {\n      \"types\": \"./server/*.d.ts\",\n      \"default\": \"./server/*.js\"\n    }\n  },\n  \"scripts\": {\n    \"build:bin\": \"esbuild ./cli/index.ts --bundle --platform=node --external:prettier --format=cjs --outfile=dist/bin.cjs\",\n    \"build\": \"node generate-exports.mjs && mkdir -p dist && npm run build:bin && cp -r *.ts server react ./package.json ./tsconfig.json ./README.md ../../LICENSE ./.npmignore dist/ && cd dist/ && rm **/*.test.* && rm -r server/_generated && tsc\",\n    \"dev\": \"chokidar '*.ts' 'server/**/*.ts' 'react/**/*.ts*' 'tsconfig*.json' 'package.json' -i '**/*.test.ts' -c 'cd ../.. && npm run build' --initial\",\n    \"typecheck\": \"tsc --noEmit\",\n    \"version\": \"pbcopy <<<$npm_package_version; $(git config core.editor || echo vim) CHANGELOG.md && prettier --write CHANGELOG.md && git add CHANGELOG.md\"\n  },\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/get-convex/convex-helpers.git\",\n    \"directory\": \"packages/convex-helpers\"\n  },\n  \"keywords\": [\n    \"convex\",\n    \"backend\",\n    \"migrations\",\n    \"ratelimit\",\n    \"database\",\n    \"react\"\n  ],\n  \"author\": \"Ian Macartney <ian@convex.dev>\",\n  \"license\": \"Apache-2.0\",\n  \"bugs\": {\n    \"url\": \"https://github.com/get-convex/convex-helpers/issues\"\n  },\n  \"homepage\": \"https://github.com/get-convex/convex-helpers/tree/main/packages/convex-helpers/README.md\",\n  \"peerDependencies\": {\n    \"@standard-schema/spec\": \"^1.0.0\",\n    \"convex\": \"^1.46.0\",\n    \"hono\": \"^4.0.5\",\n    \"react\": \"^17.0.2 || ^18.0.0 || ^19.0.0\",\n    \"typescript\": \"^5.5 || ^6.0.0 || ^7.0.0\",\n    \"zod\": \"^3.25.0 || ^4.0.0\"\n  },\n  \"peerDependenciesMeta\": {\n    \"@standard-schema/spec\": {\n      \"optional\": true\n    },\n    \"hono\": {\n      \"optional\": true\n    },\n    \"react\": {\n      \"optional\": true\n    },\n    \"typescript\": {\n      \"optional\": true\n    },\n    \"zod\": {\n      \"optional\": true\n    }\n  }\n}\n",
+          "to": "{\n  \"name\": \"@bijectionhq/helpers\",\n  \"version\": \"0.1.128\",\n  \"description\": \"A collection of useful code to complement the official Bijection package.\",\n  \"type\": \"module\",\n  \"exports\": {\n    \".\": {\n      \"types\": \"./index.d.ts\",\n      \"default\": \"./index.js\"\n    },\n    \"./validators\": {\n      \"types\": \"./validators.d.ts\",\n      \"default\": \"./validators.js\"\n    },\n    \"./standardSchema\": {\n      \"types\": \"./standardSchema.d.ts\",\n      \"default\": \"./standardSchema.js\"\n    },\n    \"./react\": {\n      \"types\": \"./react.d.ts\",\n      \"default\": \"./react.js\"\n    },\n    \"./server/pagination\": {\n      \"types\": \"./server/pagination.d.ts\",\n      \"default\": \"./server/pagination.js\"\n    },\n    \"./server/stream\": {\n      \"types\": \"./server/stream.d.ts\",\n      \"default\": \"./server/stream.js\"\n    }\n  },\n  \"scripts\": {\n    \"build\": \"tsc -p tsconfig.bijection.json\",\n    \"typecheck\": \"tsc --noEmit -p tsconfig.bijection.json\",\n    \"test\": \"vitest run index.test.ts validators.test.ts standardSchema.test.ts server/pagination.test.ts server/stream.test.ts --globals --maxWorkers=1 --no-file-parallelism\"\n  },\n  \"repository\": \"github:bijectionhq/helpers\",\n  \"keywords\": [\n    \"convex\",\n    \"backend\",\n    \"migrations\",\n    \"ratelimit\",\n    \"database\",\n    \"react\"\n  ],\n  \"author\": \"Ian Macartney <ian@convex.dev>\",\n  \"license\": \"Apache-2.0\",\n  \"bugs\": {\n    \"url\": \"https://github.com/bijectionhq/helpers/issues\"\n  },\n  \"homepage\": \"https://github.com/bijectionhq/helpers\",\n  \"peerDependencies\": {\n    \"@standard-schema/spec\": \"^1.0.0\",\n    \"hono\": \"^4.0.5\",\n    \"react\": \"^17.0.2 || ^18.0.0 || ^19.0.0\",\n    \"typescript\": \"^5.5 || ^6.0.0 || ^7.0.0\",\n    \"zod\": \"^3.25.0 || ^4.0.0\",\n    \"bijection\": \"^0.1.5\"\n  },\n  \"peerDependenciesMeta\": {\n    \"@standard-schema/spec\": {\n      \"optional\": true\n    },\n    \"hono\": {\n      \"optional\": true\n    },\n    \"react\": {\n      \"optional\": true\n    },\n    \"typescript\": {\n      \"optional\": true\n    },\n    \"zod\": {\n      \"optional\": true\n    },\n    \"bijection\": {\n      \"optional\": true\n    }\n  }\n}\n"
+        }
+      ],
+      "explanation": {
+        "why": "Install under the owned namespace, use one optional SDK peer, expose native runs with conversation primitives, and remove implicit publishing/deployment commands. Only the helpers Agent requires are shipped; other inherited sources and tests remain in the full parity inventory.",
+        "witnesses": [
+          "BIJECTION.md"
+        ]
+      }
+    },
+    {
+      "id": "concave-command",
+      "paths": [
+        "Justfile"
+      ],
+      "replacements": [
+        {
+          "from": "set fallback := true\nset shell := [\"bash\", \"-uc\"]\nset windows-shell := [\"sh\", \"-uc\"]\n\n# `just --list` (or just `just`) will print all the recipes in\n# the current Justfile. `just RECIPE` will run the macro/job.\n#\n# In several places there are recipes for running common scripts or commands.\n# Instead of `Makefile`s, Convex uses Justfiles, which are similar, but avoid\n# several footguns associated with Makefiles, since using make as a macro runner\n# can sometimes conflict with Makefiles desire to have some rudimentary\n# understanding of build artifacts and associated dependencies.\n#\n# Read up on just here: https://github.com/casey/just\n\n_default:\n  @just --list\n\nset positional-arguments\n\nreset-local-backend:\n  rm -rf convex_local_storage && rm -f convex_local_backend.sqlite3\n\n# (*) Run the open source convex backend, downloading first if necessary.\nrun-local-backend:\n  #!/usr/bin/env sh\n  set -eu\n  if [ ! -x ./convex-local-backend ]; then\n    case \"$(uname -s)-$(uname -m)\" in\n      Darwin-arm64)\n        pkg=convex-local-backend-aarch64-apple-darwin.zip\n        ;;\n      Darwin-x86_64)\n        pkg=convex-local-backend-x86_64-apple-darwin.zip\n        ;;\n      Linux-aarch64|Linux-arm64)\n        pkg=convex-local-backend-aarch64-unknown-linux-gnu.zip\n        ;;\n      Linux-x86_64)\n        pkg=convex-local-backend-x86_64-unknown-linux-gnu.zip\n        ;;\n      *)\n        echo \"Download or build the convex-local-backend: https://github.com/get-convex/convex-backend\" >&2\n        exit 1\n        ;;\n    esac\n    curl -fL -O \"https://github.com/get-convex/convex-backend/releases/latest/download/$pkg\"\n    unzip -o \"$pkg\"\n  fi\n  # Public development credentials matching the admin key in `just convex` and convex.sh.\n  # https://github.com/get-convex/convex-backend/tree/main/crates/keybroker/dev\n  exec ./convex-local-backend \\\n    --interface 127.0.0.1 \\\n    --instance-name carnitas \\\n    --instance-secret 4361726e697461732c206c69746572616c6c79206d65616e696e6720226c6974\n\n# (*) Run convex CLI commands like `convex dev` against local backend from `just run-local-backend`.\n# This uses the public development admin key matching the credentials in `just run-local-backend`.\nconvex *ARGS:\n  npx convex \"$@\" --admin-key 0135d8598650f8f5cb0f30c34ec2e2bb62793bc28717c8eb6fb577996d50be5f4281b59181095065c5d0f86a2c31ddbe9b597ec62b47ded69782cd --url \"http://127.0.0.1:3210\"\n\n# Clears a table in the cloud backend.\nclear-table *ARGS:\n  npx convex import --table \"$1\" --replace --format jsonLines /dev/null \"${@:2}\"\n",
+          "to": "set fallback := true\nset shell := [\"bash\", \"-uc\"]\nset windows-shell := [\"sh\", \"-uc\"]\n\n# `just --list` (or just `just`) will print all the recipes in\n# the current Justfile. `just RECIPE` will run the macro/job.\n#\n# In several places there are recipes for running common scripts or commands.\n# Instead of `Makefile`s, Convex uses Justfiles, which are similar, but avoid\n# several footguns associated with Makefiles, since using make as a macro runner\n# can sometimes conflict with Makefiles desire to have some rudimentary\n# understanding of build artifacts and associated dependencies.\n#\n# Read up on just here: https://github.com/casey/just\n\n_default:\n  @just --list\n\nset positional-arguments\n\nreset-local-backend:\n  rm -rf convex_local_storage && rm -f convex_local_backend.sqlite3\n\n# (*) Run the open source convex backend, downloading first if necessary.\nrun-local-backend:\n  #!/usr/bin/env sh\n  set -eu\n  if [ ! -x ./convex-local-backend ]; then\n    case \"$(uname -s)-$(uname -m)\" in\n      Darwin-arm64)\n        pkg=convex-local-backend-aarch64-apple-darwin.zip\n        ;;\n      Darwin-x86_64)\n        pkg=convex-local-backend-x86_64-apple-darwin.zip\n        ;;\n      Linux-aarch64|Linux-arm64)\n        pkg=convex-local-backend-aarch64-unknown-linux-gnu.zip\n        ;;\n      Linux-x86_64)\n        pkg=convex-local-backend-x86_64-unknown-linux-gnu.zip\n        ;;\n      *)\n        echo \"Download or build the convex-local-backend: https://github.com/get-convex/convex-backend\" >&2\n        exit 1\n        ;;\n    esac\n    curl -fL -O \"https://github.com/get-convex/convex-backend/releases/latest/download/$pkg\"\n    unzip -o \"$pkg\"\n  fi\n  # Public development credentials matching the admin key in `just convex` and convex.sh.\n  # https://github.com/get-convex/convex-backend/tree/main/crates/keybroker/dev\n  exec ./convex-local-backend \\\n    --interface 127.0.0.1 \\\n    --instance-name carnitas \\\n    --instance-secret 4361726e697461732c206c69746572616c6c79206d65616e696e6720226c6974\n\n# (*) Run convex CLI commands like `convex dev` against local backend from `just run-local-backend`.\n# This uses the public development admin key matching the credentials in `just run-local-backend`.\nconvex *ARGS:\n  npx convex \"$@\" --admin-key 0135d8598650f8f5cb0f30c34ec2e2bb62793bc28717c8eb6fb577996d50be5f4281b59181095065c5d0f86a2c31ddbe9b597ec62b47ded69782cd --url \"http://127.0.0.1:3210\"\n\n# Clears a table in the cloud backend.\nclear-table *ARGS:\n  npx convex import --table \"$1\" --replace --format jsonLines /dev/null \"${@:2}\"\n\n# Bijection uses its existing source-preservation owner.\nconcave *ARGS:\n  cd tools/concave && GOWORK=off go run ./cmd/concave --repo ../.. {{ARGS}}\n"
+        }
+      ],
+      "explanation": {
+        "why": "Add the existing Concave entry point while preserving every upstream recipe.",
+        "witnesses": [
+          "BIJECTION.md"
+        ]
+      }
+    },
+    {
+      "id": "concave-source-inventory",
+      "paths": [
+        ".gitignore"
+      ],
+      "replacements": [
+        {
+          "from": "# Or our local env\n.env.local\n\n# Logs\nlogs\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\nlerna-debug.log*\n\n# Diagnostic reports (https://nodejs.org/api/report.html)\nreport.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json\n\n# Runtime data\npids\n*.pid\n*.seed\n*.pid.lock\n\n# Directory for instrumented libs generated by jscoverage/JSCover\nlib-cov\n\n# Coverage directory used by tools like istanbul\ncoverage\n*.lcov\n\n# nyc test coverage\n.nyc_output\n\n# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)\n.grunt\n\n# Bower dependency directory (https://bower.io/)\nbower_components\n\n# node-waf configuration\n.lock-wscript\n\n# Compiled binary addons (https://nodejs.org/api/addons.html)\nbuild/Release\n\n# Dependency directories\nnode_modules/\njspm_packages/\n\n# TypeScript v1 declaration files\ntypings/\n\n# TypeScript cache\n*.tsbuildinfo\n\n# Optional npm cache directory\n.npm\n\n# Optional eslint cache\n.eslintcache\n\n# Microbundle cache\n.rpt2_cache/\n.rts2_cache_cjs/\n.rts2_cache_es/\n.rts2_cache_umd/\n\n# Optional REPL history\n.node_repl_history\n\n# Output of 'npm pack'\n*.tgz\n\n# Yarn Integrity file\n.yarn-integrity\n\n# dotenv environment variables file\n.env\n.env.test\n\n# parcel-bundler cache (https://parceljs.org/)\n.cache\n\n# Next.js build output\n.next\n\n# Nuxt.js build / generate output\n.nuxt\ndist\n\n# Gatsby files\n.cache/\n# Comment in the public line in if your project uses Gatsby and *not* Next.js\n# https://nextjs.org/blog/next-9-1#public-directory-support\n# public\n\n# vuepress build output\n.vuepress/dist\n\n# Serverless directories\n.serverless/\n\n# FuseBox cache\n.fusebox/\n\n# DynamoDB Local files\n.dynamodb/\n\n# TernJS port file\n.tern-port\ntsconfig.tsbuildinfo\nconvex-local-backend*\n.mypy_cache\n__pycache__/\n\n# Claude Code local settings\n.claude/settings.local.json\n",
+          "to": "# Or our local env\n.env.local\n\n# Logs\nlogs\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\nlerna-debug.log*\n\n# Diagnostic reports (https://nodejs.org/api/report.html)\nreport.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json\n\n# Runtime data\npids\n*.pid\n*.seed\n*.pid.lock\n\n# Directory for instrumented libs generated by jscoverage/JSCover\nlib-cov\n\n# Coverage directory used by tools like istanbul\ncoverage\n*.lcov\n\n# nyc test coverage\n.nyc_output\n\n# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)\n.grunt\n\n# Bower dependency directory (https://bower.io/)\nbower_components\n\n# node-waf configuration\n.lock-wscript\n\n# Compiled binary addons (https://nodejs.org/api/addons.html)\nbuild/Release\n\n# Dependency directories\nnode_modules/\njspm_packages/\n\n# TypeScript v1 declaration files\ntypings/\n\n# TypeScript cache\n*.tsbuildinfo\n\n# Optional npm cache directory\n.npm\n\n# Optional eslint cache\n.eslintcache\n\n# Microbundle cache\n.rpt2_cache/\n.rts2_cache_cjs/\n.rts2_cache_es/\n.rts2_cache_umd/\n\n# Optional REPL history\n.node_repl_history\n\n# Output of 'npm pack'\n*.tgz\n\n# Yarn Integrity file\n.yarn-integrity\n\n# dotenv environment variables file\n.env\n.env.test\n\n# parcel-bundler cache (https://parceljs.org/)\n.cache\n\n# Next.js build output\n.next\n\n# Nuxt.js build / generate output\n.nuxt\ndist\n\n# Gatsby files\n.cache/\n# Comment in the public line in if your project uses Gatsby and *not* Next.js\n# https://nextjs.org/blog/next-9-1#public-directory-support\n# public\n\n# vuepress build output\n.vuepress/dist\n\n# Serverless directories\n.serverless/\n\n# FuseBox cache\n.fusebox/\n\n# DynamoDB Local files\n.dynamodb/\n\n# TernJS port file\n.tern-port\ntsconfig.tsbuildinfo\nconvex-local-backend*\n.mypy_cache\n__pycache__/\n\n# Claude Code local settings\n.claude/settings.local.json\n\n# Source-preservation tooling is source, including its coverage package.\n!/tools/\n!/tools/**\n\n/target/\n/node_modules/\n/dist/\n"
+        }
+      ],
+      "explanation": {
+        "why": "Include the complete checker source without changing upstream artifact exclusions.",
+        "witnesses": [
+          "tools/concave-source.json"
+        ]
+      }
+    },
+    {
+      "id": "maintenance-instructions-mirror",
+      "paths": [
+        "CLAUDE.md"
+      ],
+      "replacements": [
+        {
+          "from": "<!-- convex-ai-start -->\n\nThis project uses [Convex](https://convex.dev) as its backend.\n\nWhen working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.\n\nConvex agent skills for common tasks can be installed by running `npx convex ai-files install`.\n\n<!-- convex-ai-end -->\n",
+          "to": "When doing a task that involves modifying complex TypeScript types, run `npm run typecheck` in the root of the repository to ensure that the types are correct.\nDo not install node modules in packages/convex-helpers. Install all packages in the root directory.\nThe convex/ directory is example usage exercising the package as in a real app.\nThe packages/convex-helpers/dist directory is the package we publish.\n\nRun `npm run format` to format the code before committing.\n\n<!-- convex-ai-start -->\n\nThis project uses [Convex](https://convex.dev) as its backend.\n\nWhen working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.\n\nConvex agent skills for common tasks can be installed by running `npx convex ai-files install`.\n\n<!-- convex-ai-end -->\n"
+        }
+      ],
+      "explanation": {
+        "why": "Bootstrap the publication owner mirror from the single maintenance contract. After the first reviewed fork commit this becomes a derived file over AGENTS.md.",
+        "witnesses": [
+          "scripts/check_agent_mirror.py"
+        ]
+      }
+    }
+  ],
+  "checks": {
+    "agent-mirror": {
+      "directory": ".",
+      "inputs": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        "scripts/check_agent_mirror.py"
+      ],
+      "command": [
+        "python3",
+        "scripts/check_agent_mirror.py"
+      ],
+      "toolchain": [
+        {
+          "command": [
+            "python3",
+            "--version"
+          ]
+        }
+      ],
+      "timeout_seconds": 10,
+      "results": "command"
+    }
+  }
+}

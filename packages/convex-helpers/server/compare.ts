@@ -1,4 +1,4 @@
 /**
  * @deprecated Use `compareValues` from `convex/values` instead.
  */
-export { compareValues } from "convex/values";
+export { compareValues } from "bijection/values";

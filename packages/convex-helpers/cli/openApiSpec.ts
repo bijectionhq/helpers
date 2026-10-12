@@ -1,6 +1,6 @@
 import fs from "fs";
 import { Command, Option } from "commander";
-import type { ValidatorJSON } from "convex/values";
+import type { ValidatorJSON } from "bijection/values";
 import chalk from "chalk";
 import type { AnalyzedFunction, FunctionSpec } from "./utils.js";
 import { getFunctionSpec } from "./utils.js";

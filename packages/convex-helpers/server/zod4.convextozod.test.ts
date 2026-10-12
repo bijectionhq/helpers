@@ -9,8 +9,8 @@ import {
   v,
   VFloat64,
   VString,
-} from "convex/values";
-import { convexToZod, Zid, zid, ZodValidatorFromConvex } from "./zod4";
+} from "bijection/values";
+import { convexToZod, Zid, zid, ZodValidatorFromBijection } from "./zod4";
 import { literals } from "../validators";
 import { isSameType } from "zod-compare";
 
@@ -23,9 +23,9 @@ describe("convexToZod", () => {
   test("id", () => {
     expectTypeOf(convexToZod(v.id("users"))).toEqualTypeOf<Zid<"users">>();
   });
-  test("string", () => testConvexToZod(v.string(), z.string()));
-  test("number", () => testConvexToZod(v.number(), z.number()));
-  test("int64", () => testConvexToZod(v.int64(), z.bigint()));
+  test("string", () => testBijectionToZod(v.string(), z.string()));
+  test("number", () => testBijectionToZod(v.number(), z.number()));
+  test("int64", () => testBijectionToZod(v.int64(), z.bigint()));
   test("commitTs", () => {
     const _expected = z.union([z.bigint(), z.instanceof(CommitTsPlaceholder)]);
     const actual = convexToZod(v.commitTs());
@@ -33,33 +33,33 @@ describe("convexToZod", () => {
     expect(actual.safeParse(1n).success).toBe(true);
     expect(actual.safeParse(new CommitTsPlaceholder()).success).toBe(true);
   });
-  test("boolean", () => testConvexToZod(v.boolean(), z.boolean()));
-  test("null", () => testConvexToZod(v.null(), z.null()));
-  test("any", () => testConvexToZod(v.any(), z.any()));
+  test("boolean", () => testBijectionToZod(v.boolean(), z.boolean()));
+  test("null", () => testBijectionToZod(v.null(), z.null()));
+  test("any", () => testBijectionToZod(v.any(), z.any()));
   test("bytes", () => {
     expect(() => convexToZod(v.bytes())).toThrow();
   });
 
   test("optional", () => {
-    testConvexToZod(v.optional(v.string()), z.string().optional());
+    testBijectionToZod(v.optional(v.string()), z.string().optional());
   });
 
   test("array", () => {
-    testConvexToZod(v.array(v.string()), z.array(z.string()));
+    testBijectionToZod(v.array(v.string()), z.array(z.string()));
   });
 
   describe("union", () => {
     test("never", () => {
-      testConvexToZod(v.union(), z.never());
+      testBijectionToZod(v.union(), z.never());
     });
     test("one element (number)", () => {
-      testConvexToZod(v.union(v.number()), z.number());
+      testBijectionToZod(v.union(v.number()), z.number());
     });
     test("one element (string)", () => {
-      testConvexToZod(v.union(v.string()), z.string());
+      testBijectionToZod(v.union(v.string()), z.string());
     });
     test("multiple elements", () => {
-      testConvexToZod(
+      testBijectionToZod(
         v.union(v.string(), v.number()),
         z.union([z.string(), z.number()]),
       );
@@ -70,7 +70,7 @@ describe("convexToZod", () => {
     const brandedString = z.string().brand("myBrand");
     type BrandedStringType = z.output<typeof brandedString>;
 
-    testConvexToZod(
+    testBijectionToZod(
       v.string() as VString<BrandedStringType, "required">,
       brandedString,
     );
@@ -79,14 +79,14 @@ describe("convexToZod", () => {
     const brandedNumber = z.number().brand("myBrand");
     type BrandedNumberType = z.output<typeof brandedNumber>;
 
-    testConvexToZod(
+    testBijectionToZod(
       v.number() as VFloat64<BrandedNumberType, "required">,
       brandedNumber,
     );
   });
 
   test("object", () => {
-    testConvexToZod(
+    testBijectionToZod(
       v.object({
         name: v.string(),
         age: v.number(),
@@ -102,14 +102,14 @@ describe("convexToZod", () => {
 
   describe("record", () => {
     test("key = string", () => {
-      testConvexToZod(
+      testBijectionToZod(
         v.record(v.string(), v.number()),
         z.record(z.string(), z.number()),
       );
     });
 
     test("key = literal", () => {
-      testConvexToZod(
+      testBijectionToZod(
         v.record(v.literal("user"), v.number()),
         z.record(z.literal("user"), z.number()),
       );
@@ -124,12 +124,12 @@ describe("convexToZod", () => {
         z.union([z.literal("user"), z.literal("admin")]),
         z.number(),
       );
-      testConvexToZod(convexValidator, zodSchema);
+      testBijectionToZod(convexValidator, zodSchema);
 
       // On both Zod and Convex, the record must be exhaustive when the key is a union of literals.
       const partial = { user: 42 } as const;
       // @ts-expect-error -- This should not typecheck
-      const _asConvex: Infer<typeof convexValidator> = partial;
+      const _asBijection: Infer<typeof convexValidator> = partial;
       // @ts-expect-error -- This should not typecheck
       const _asZod: z.output<typeof zodSchema> = partial;
     });
@@ -158,28 +158,28 @@ describe("convexToZod", () => {
         expect(actual.safeParse(42).success).toBe(false);
       });
       test("string", () => {
-        testConvexToZod(v.optional(v.string()), z.string().optional());
+        testBijectionToZod(v.optional(v.string()), z.string().optional());
       });
       test("float64", () => {
-        testConvexToZod(v.optional(v.float64()), z.number().optional());
+        testBijectionToZod(v.optional(v.float64()), z.number().optional());
       });
       test("int64", () => {
-        testConvexToZod(v.optional(v.int64()), z.bigint().optional());
+        testBijectionToZod(v.optional(v.int64()), z.bigint().optional());
       });
       test("boolean", () => {
-        testConvexToZod(v.optional(v.boolean()), z.boolean().optional());
+        testBijectionToZod(v.optional(v.boolean()), z.boolean().optional());
       });
       test("null", () => {
-        testConvexToZod(v.optional(v.null()), z.null().optional());
+        testBijectionToZod(v.optional(v.null()), z.null().optional());
       });
       test("any", () => {
-        testConvexToZod(v.optional(v.any()), z.any().optional());
+        testBijectionToZod(v.optional(v.any()), z.any().optional());
       });
       test("literal", () => {
-        testConvexToZod(v.optional(v.literal(42n)), z.literal(42n).optional());
+        testBijectionToZod(v.optional(v.literal(42n)), z.literal(42n).optional());
       });
       test("object", () => {
-        testConvexToZod(
+        testBijectionToZod(
           v.optional(
             v.object({
               required: v.string(),
@@ -195,19 +195,19 @@ describe("convexToZod", () => {
         );
       });
       test("array", () => {
-        testConvexToZod(
+        testBijectionToZod(
           v.optional(v.array(v.int64())),
           z.array(z.bigint()).optional(),
         );
       });
       test("record", () => {
-        testConvexToZod(
+        testBijectionToZod(
           v.optional(v.record(v.string(), v.number())),
           z.record(z.string(), z.number()).optional(),
         );
       });
       test("union", () => {
-        testConvexToZod(
+        testBijectionToZod(
           v.optional(v.union(v.number(), v.string())),
           z.union([z.number(), z.string()]).optional(),
         );
@@ -217,7 +217,7 @@ describe("convexToZod", () => {
 
   // https://github.com/get-convex/convex-helpers/issues/861
   test("regression: literals helper", () => {
-    testConvexToZod(
+    testBijectionToZod(
       v.object({
         firstName: v.string(),
         lastName: v.string(),
@@ -239,7 +239,7 @@ describe("convexToZod", () => {
       Admin = "admin",
     }
 
-    testConvexToZod(
+    testBijectionToZod(
       v.union(...Object.values(Role).map(v.literal)),
       ignoreZodUnionOrder(
         z.union([
@@ -258,16 +258,16 @@ type Equals<X, Y> =
     ? true
     : false;
 
-function testConvexToZod<
+function testBijectionToZod<
   C extends GenericValidator,
   Expected extends zCore.$ZodType,
 >(
   validator: C,
   expected: Expected &
-    (Equals<Expected, ZodValidatorFromConvex<C>> extends true
+    (Equals<Expected, ZodValidatorFromBijection<C>> extends true
       ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         {}
-      : "Expected type must exactly match ZodValidatorFromConvex<C>"),
+      : "Expected type must exactly match ZodValidatorFromBijection<C>"),
 ) {
   const actual = convexToZod(validator);
   expect(isSameType(actual, expected)).toBe(true);

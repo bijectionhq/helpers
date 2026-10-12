@@ -59,9 +59,9 @@ import type {
   FunctionReturnType,
   GenericActionCtx,
   GenericDataModel,
-} from "convex/server";
-import type { Validator } from "convex/values";
-import { v } from "convex/values";
+} from "bijection/server";
+import type { Validator } from "bijection/values";
+import { v } from "bijection/values";
 import type { BetterOmit, EmptyObject } from "../index.js";
 
 // Branded string type for session IDs.

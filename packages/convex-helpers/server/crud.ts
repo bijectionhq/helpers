@@ -11,20 +11,20 @@ import type {
   GenericSchema,
   TableNamesInDataModel,
   DataModelFromSchemaDefinition,
-} from "convex/server";
+} from "bijection/server";
 import {
   paginationOptsValidator,
   internalQueryGeneric,
   internalMutationGeneric,
-} from "convex/server";
+} from "bijection/server";
 import type {
   GenericId,
   Infer,
   Validator,
   VObject,
   VUnion,
-} from "convex/values";
-import { v } from "convex/values";
+} from "bijection/values";
+import { v } from "bijection/values";
 import { doc, partial, systemFields } from "../validators.js";
 /**
  * Create CRUD operations for a table.
@@ -32,7 +32,7 @@ import { doc, partial, systemFields } from "../validators.js";
  *
  * ```ts
  * // in convex/users.ts
- * import { crud } from "convex-helpers/server/crud";
+ * import { crud } from "@bijectionhq/helpers/server/crud";
  * import schema from "./schema";
  *
  * export const { create, read, update, destroy } = crud(schema, "users");

@@ -3,7 +3,7 @@
  * It does not contain any tests, but the .test path both excludes it from the
  * generated API spec and indicates its intent.
  */
-import { httpRouter, httpActionGeneric } from "convex/server";
+import { httpRouter, httpActionGeneric } from "bijection/server";
 import { corsRouter } from "./cors.js";
 
 const everythingHandler = httpActionGeneric(async () => {

@@ -1,14 +1,14 @@
 "use client";
-import { useConvex, ConvexReactClient } from "convex/react";
+import { useBijection, BijectionReactClient } from "bijection/react";
 import type {
   FunctionArgs,
   FunctionReference,
   FunctionReference_future,
-} from "convex/server";
+} from "bijection/server";
 import type { FC, PropsWithChildren } from "react";
 import { createContext, useMemo } from "react";
 
-export const ConvexQueryCacheContext = createContext({
+export const BijectionQueryCacheContext = createContext({
   registry: null as CacheRegistry | null,
 });
 
@@ -17,17 +17,17 @@ export const ConvexQueryCacheContext = createContext({
  * tree so that cached `useQuery` calls can be used.
  *
  * @component
- * @param {ConvexQueryCacheOptions} props.options - Options for the query cache
+ * @param {BijectionQueryCacheOptions} props.options - Options for the query cache
  * @returns {Element}
  */
-export const ConvexQueryCacheProvider: FC<
-  PropsWithChildren<ConvexQueryCacheOptions>
+export const BijectionQueryCacheProvider: FC<
+  PropsWithChildren<BijectionQueryCacheOptions>
 > = ({ children, debug, expiration, maxIdleEntries }) => {
-  const convex = useConvex();
+  const convex = useBijection();
   if (convex === undefined) {
     throw new Error(
-      "Could not find Convex client! `ConvexQueryCacheProvider` must be used in the React component " +
-        "tree under `ConvexProvider`. Did you forget it? " +
+      "Could not find Convex client! `BijectionQueryCacheProvider` must be used in the React component " +
+        "tree under `BijectionProvider`. Did you forget it? " +
         "See https://docs.convex.dev/quick-start#set-up-convex-in-your-react-app",
     );
   }
@@ -36,16 +36,16 @@ export const ConvexQueryCacheProvider: FC<
     [convex, debug, expiration, maxIdleEntries],
   );
   return (
-    <ConvexQueryCacheContext.Provider value={{ registry }}>
+    <BijectionQueryCacheContext.Provider value={{ registry }}>
       {children}
-    </ConvexQueryCacheContext.Provider>
+    </BijectionQueryCacheContext.Provider>
   );
 };
 
 const DEFAULT_EXPIRATION_MS = 300_000; // 5 minutes
 const DEFAULT_MAX_ENTRIES = 250;
 
-export type ConvexQueryCacheOptions = {
+export type BijectionQueryCacheOptions = {
   /**
    * How long, in milliseconds, to keep the subscription to the convex
    * query alive even after all references in the app have been dropped.
@@ -87,12 +87,12 @@ type CachedQuery = {
 class CacheRegistry {
   queries: Map<QueryKey, CachedQuery>;
   subs: Map<SubKey, QueryKey>;
-  convex: ConvexReactClient;
+  convex: BijectionReactClient;
   timeout: number;
   maxIdleEntries: number;
   idle: number;
 
-  constructor(convex: ConvexReactClient, options: ConvexQueryCacheOptions) {
+  constructor(convex: BijectionReactClient, options: BijectionQueryCacheOptions) {
     this.queries = new Map();
     this.subs = new Map();
     this.convex = convex;

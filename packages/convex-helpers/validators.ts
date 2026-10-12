@@ -5,7 +5,7 @@ import type {
   SchemaDefinition,
   SystemTableNames,
   TableNamesInDataModel,
-} from "convex/server";
+} from "bijection/server";
 import type {
   GenericId,
   GenericValidator,
@@ -29,8 +29,8 @@ import type {
   VRecord,
   VString,
   VUnion,
-} from "convex/values";
-import { asObjectValidator, v } from "convex/values";
+} from "bijection/values";
+import { asObjectValidator, v } from "bijection/values";
 import { assert } from "./index.js";
 
 /**

@@ -8,7 +8,7 @@
 ## Usage for this helper:
 
 ```ts
-import { defineRateLimits } from "convex-helpers/server/rateLimit";
+import { defineRateLimits } from "@bijectionhq/helpers/server/rateLimit";
 
 const SECOND = 1000; // ms
 const MINUTE = 60 * SECOND;
@@ -100,18 +100,18 @@ await rateLimit(ctx, {
 
 - `key` is a rate limit specific to some user / team / session ID / etc.
 - `count` is how many to consume (default is 1)
-- `throws` configures it to throw a `ConvexError` with `RateLimitError` data
+- `throws` configures it to throw a `BijectionError` with `RateLimitError` data
   instead of returning when `ok` is false.
  */
-import { v } from "convex/values";
-import { ConvexError } from "convex/values";
+import { v } from "bijection/values";
+import { BijectionError } from "bijection/values";
 import type {
   GenericDatabaseReader,
   GenericDatabaseWriter,
   DataModelFromSchemaDefinition,
   SchemaDefinition,
-} from "convex/server";
-import { defineTable } from "convex/server";
+} from "bijection/server";
+import { defineTable } from "bijection/server";
 
 /**
  * A token bucket limits the rate of requests by continuously adding tokens to
@@ -180,7 +180,7 @@ export type RateLimitError = {
 export function isRateLimitError(
   error: unknown,
 ): error is { data: RateLimitError } {
-  return error instanceof ConvexError && error.data["kind"] === "RateLimited";
+  return error instanceof BijectionError && error.data["kind"] === "RateLimited";
 }
 
 /**
@@ -414,7 +414,7 @@ export async function checkRateLimit<DataModel extends RateLimitDataModel>(
   if (value < 0) {
     if (!args.reserve || (config.maxReserved && -value > config.maxReserved)) {
       if (args.throws) {
-        throw new ConvexError({
+        throw new BijectionError({
           kind: "RateLimited",
           name: args.name,
           retryAt,

@@ -1,11 +1,11 @@
 /* eslint-disable no-unexpected-multiline */
-import type { Value } from "convex/values";
+import type { Value } from "bijection/values";
 import {
-  convexToJson,
+  bijectionToJson,
   compareValues,
-  jsonToConvex,
+  jsonToBijection,
   getDocumentSize,
-} from "convex/values";
+} from "bijection/values";
 import type {
   DataModelFromSchemaDefinition,
   DocumentByInfo,
@@ -25,7 +25,7 @@ import type {
   SchemaDefinition,
   SystemDataModel,
   TableNamesInDataModel,
-} from "convex/server";
+} from "bijection/server";
 
 export type IndexKey = (Value | undefined)[];
 
@@ -552,9 +552,14 @@ export interface GenericOrderedQuery<T> extends AsyncIterable<T> {
   filter(predicate: any): this;
 }
 
+// concave:begin stream-contract-stream-database-reader
+// why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: Upstream combinators implement the extended reader contract.
 export class StreamDatabaseReader<
   Schema extends SchemaDefinition<any, boolean>,
-> implements GenericDatabaseReader<DM<Schema>> {
+> {
+// concave:end stream-contract-stream-database-reader
   // TODO: support system tables
   public system: GenericDatabaseReader<SystemDataModel>["system"];
 
@@ -608,25 +613,32 @@ export type QueryReflection<
   ) => IndexRange;
 };
 
+// concave:begin stream-contract-streamable-query
+// why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: Upstream combinators implement the extended reader contract.
 export abstract class StreamableQuery<
   Schema extends SchemaDefinition<any, boolean>,
   T extends TableNamesInDataModel<DM<Schema>>,
   IndexName extends IndexNames<NamedTableInfo<DM<Schema>, T>>,
 >
   extends QueryStream<DocumentByInfo<NamedTableInfo<DM<Schema>, T>>>
-  // this "implements" is redundant, since QueryStream implies it, but it acts as a type-time assertion.
-  implements OrderedQuery<NamedTableInfo<DM<Schema>, T>>
 {
+// concave:end stream-contract-streamable-query
   abstract reflect(): QueryReflection<Schema, T, IndexName>;
 }
 
+// concave:begin stream-contract-stream-query-initializer
+// why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: Upstream combinators implement the extended reader contract.
 export class StreamQueryInitializer<
   Schema extends SchemaDefinition<any, boolean>,
   T extends TableNamesInDataModel<DM<Schema>>,
 >
   extends StreamableQuery<Schema, T, "by_creation_time">
-  implements QueryInitializer<NamedTableInfo<DM<Schema>, T>>
 {
+// concave:end stream-contract-stream-query-initializer
   constructor(
     public parent: StreamDatabaseReader<Schema>,
     public table: T,
@@ -667,10 +679,20 @@ export class StreamQueryInitializer<
   ): OrderedStreamQuery<Schema, T, "by_creation_time"> {
     return this.inner().order(order);
   }
-  reflect() {
+  // concave:begin stream-query-initializer-reflection
+// why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: The compiler names inferred results through public SDK types.
+reflect(): QueryReflection<Schema, T, "by_creation_time"> {
+// concave:end stream-query-initializer-reflection
     return this.inner().reflect();
   }
-  iterWithKeys(trackBandwidth = false) {
+  // concave:begin stream-query-initializer-iterator
+// why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: The compiler names inferred results through public SDK types.
+iterWithKeys(trackBandwidth = false): StreamIterable<DocumentByName<DM<Schema>, T>> {
+// concave:end stream-query-initializer-iterator
     return this.inner().iterWithKeys(trackBandwidth);
   }
   getOrder(): "asc" | "desc" {
@@ -682,20 +704,29 @@ export class StreamQueryInitializer<
   getIndexFields(): string[] {
     return this.inner().getIndexFields();
   }
-  narrow(indexBounds: IndexBounds) {
+  // concave:begin stream-query-initializer-bounds
+// why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: The compiler names inferred results through public SDK types.
+narrow(indexBounds: IndexBounds): QueryStream<DocumentByName<DM<Schema>, T>> {
+// concave:end stream-query-initializer-bounds
     return this.inner().narrow(indexBounds);
   }
 }
 
 // Not to be confused with QueryStream or StreamableQuery.
+// concave:begin stream-contract-stream-query
+// why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: Upstream combinators implement the extended reader contract.
 export class StreamQuery<
   Schema extends SchemaDefinition<any, boolean>,
   T extends TableNamesInDataModel<DM<Schema>>,
   IndexName extends IndexNames<NamedTableInfo<DM<Schema>, T>>,
 >
   extends StreamableQuery<Schema, T, IndexName>
-  implements Query<NamedTableInfo<DM<Schema>, T>>
 {
+// concave:end stream-contract-stream-query
   constructor(
     public parent: StreamQueryInitializer<Schema, T>,
     public index: IndexName,
@@ -717,10 +748,20 @@ export class StreamQuery<
   inner() {
     return this.order("asc");
   }
-  reflect() {
+  // concave:begin stream-query-reflection
+// why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: The compiler names inferred results through public SDK types.
+reflect(): QueryReflection<Schema, T, IndexName> {
+// concave:end stream-query-reflection
     return this.inner().reflect();
   }
-  iterWithKeys(trackBandwidth = false) {
+  // concave:begin stream-query-iterator
+// why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: The compiler names inferred results through public SDK types.
+iterWithKeys(trackBandwidth = false): StreamIterable<DocumentByName<DM<Schema>, T>> {
+// concave:end stream-query-iterator
     return this.inner().iterWithKeys(trackBandwidth);
   }
   getOrder(): "asc" | "desc" {
@@ -732,26 +773,40 @@ export class StreamQuery<
   getIndexFields(): string[] {
     return this.inner().getIndexFields();
   }
-  narrow(indexBounds: IndexBounds) {
+  // concave:begin stream-query-bounds
+// why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: The compiler names inferred results through public SDK types.
+narrow(indexBounds: IndexBounds): QueryStream<DocumentByName<DM<Schema>, T>> {
+// concave:end stream-query-bounds
     return this.inner().narrow(indexBounds);
   }
 }
 
+// concave:begin stream-contract-ordered-stream-query
+// why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: Upstream combinators implement the extended reader contract.
 export class OrderedStreamQuery<
   Schema extends SchemaDefinition<any, boolean>,
   T extends TableNamesInDataModel<DM<Schema>>,
   IndexName extends IndexNames<NamedTableInfo<DM<Schema>, T>>,
 >
   extends StreamableQuery<Schema, T, IndexName>
-  implements OrderedQuery<NamedTableInfo<DM<Schema>, T>>
 {
+// concave:end stream-contract-ordered-stream-query
   constructor(
     public parent: StreamQuery<Schema, T, IndexName>,
     public order: "asc" | "desc",
   ) {
     super();
   }
-  reflect() {
+  // concave:begin ordered-stream-query-reflection
+// why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: The compiler names inferred results through public SDK types.
+reflect(): QueryReflection<Schema, T, IndexName> {
+// concave:end ordered-stream-query-reflection
     return {
       db: this.parent.parent.parent.db,
       schema: this.parent.parent.parent.schema,
@@ -809,7 +864,12 @@ export class OrderedStreamQuery<
   getIndexFields(): string[] {
     return this.parent.q.indexFields;
   }
-  narrow(indexBounds: IndexBounds) {
+  // concave:begin ordered-stream-query-bounds
+// why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
+// witness: packages/convex-helpers/server/stream.test.ts
+// remove-when: The compiler names inferred results through public SDK types.
+narrow(indexBounds: IndexBounds): QueryStream<DocumentByName<DM<Schema>, T>> {
+// concave:end ordered-stream-query-bounds
     const { db, table, index, order, bounds, schema } = this.reflect();
     let maxLowerBound = bounds.lowerBound;
     let maxLowerBoundInclusive = bounds.lowerBoundInclusive;
@@ -2039,7 +2099,7 @@ function compareKeys(key1: Key, key2: Key): number {
 
 function serializeCursor(key: IndexKey): string {
   return JSON.stringify(
-    convexToJson(
+    bijectionToJson(
       key.map((v): Value =>
         v === undefined
           ? "undefined"
@@ -2054,7 +2114,7 @@ function serializeCursor(key: IndexKey): string {
 }
 
 function deserializeCursor(cursor: string): IndexKey {
-  return (jsonToConvex(JSON.parse(cursor)) as Value[]).map((v) => {
+  return (jsonToBijection(JSON.parse(cursor)) as Value[]).map((v) => {
     if (typeof v === "string") {
       if (v === "undefined") {
         // This is a special case for the undefined value.

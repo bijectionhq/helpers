@@ -23,7 +23,7 @@ import {
   type RouteSpec,
   type RouteSpecWithPath,
   type RouteSpecWithPathPrefix,
-} from "convex/server";
+} from "bijection/server";
 
 export const DEFAULT_EXPOSED_HEADERS = [
   // For Range requests

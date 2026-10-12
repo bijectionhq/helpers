@@ -81,8 +81,8 @@ export const FUNCTIONS_JSON = `{
   }`;
 
 export const JS_API = `
-import { type FunctionReference, anyApi } from "convex/server"
-import { type GenericId as Id } from "convex/values"
+import { type FunctionReference, anyApi } from "bijection/server"
+import { type GenericId as Id } from "bijection/values"
 
 export const api: PublicApiType = anyApi as unknown as PublicApiType;
 export const internal: InternalApiType = anyApi as unknown as InternalApiType;

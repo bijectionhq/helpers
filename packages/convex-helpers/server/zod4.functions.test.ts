@@ -5,7 +5,7 @@ import type {
   ActionBuilder,
   ApiFromModules,
   FunctionReference,
-} from "convex/server";
+} from "bijection/server";
 import {
   defineTable,
   defineSchema,
@@ -13,13 +13,13 @@ import {
   mutationGeneric,
   actionGeneric,
   anyApi,
-} from "convex/server";
-import { convexTest } from "convex-test";
+} from "bijection/server";
+import { bijectionTest } from "@bijectionhq/test";
 import { assertType, describe, expect, expectTypeOf, test } from "vitest";
 import { modules } from "./setup.test.js";
 import { zCustomQuery, zCustomMutation, zCustomAction, zid } from "./zod4.js";
 import { z } from "zod/v4";
-import { v } from "convex/values";
+import { v } from "bijection/values";
 import { NoOp } from "./customFunctions.js";
 
 const schema = defineSchema({
@@ -182,7 +182,7 @@ export const transformAsync = zQuery({
   }),
 });
 
-export const testQueryWithSkipConvexValidation = zQuery({
+export const testQueryWithSkipBijectionValidation = zQuery({
   args: {
     name: z.string(),
     age: z.number(),
@@ -210,7 +210,7 @@ export const testQueryWithSkipConvexValidation = zQuery({
     message: z.string(),
     doubledAge: z.number(),
   }),
-  skipConvexValidation: true,
+  skipBijectionValidation: true,
 });
 
 /**
@@ -295,7 +295,7 @@ const testApi: ApiFromModules<{
     testQueryNoArgs: typeof testQueryNoArgs;
     testMutation: typeof testMutation;
     testAction: typeof testAction;
-    testQueryWithSkipConvexValidation: typeof testQueryWithSkipConvexValidation;
+    testQueryWithSkipBijectionValidation: typeof testQueryWithSkipBijectionValidation;
     returnsNothing: typeof returnsNothing;
     transform: typeof transform;
     transformAsync: typeof transformAsync;
@@ -308,7 +308,7 @@ const testApi: ApiFromModules<{
 describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
   describe("simple function calls", () => {
     test("zCustomQuery", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const response = await t.query(testApi.testQuery, {
         name: "Alice",
         age: 30,
@@ -329,13 +329,13 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
 
     describe("zCustomQuery with no args", () => {
       test("through t.query", async () => {
-        const t = convexTest(schema, modules);
+        const t = bijectionTest(schema, modules);
         const response = await t.query(testApi.testQueryNoArgs);
         expect(response).toBeNull();
       });
 
       test("through t.run", async () => {
-        const t = convexTest(schema, modules);
+        const t = bijectionTest(schema, modules);
         const response = await t.run((ctx) =>
           ctx.runQuery(testApi.testQueryNoArgs),
         );
@@ -344,7 +344,7 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
     });
 
     test("zCustomMutation", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const response = await t.mutation(testApi.testMutation, {
         userId: "user123",
         score: 75,
@@ -366,7 +366,7 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
     });
 
     test("zCustomAction", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const response = await t.action(testApi.testAction, {
         input: "test",
         multiplier: 3,
@@ -387,14 +387,14 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
 
     test("function that returns nothing has a return value of null", async () => {
       // `undefined` is not a valid Convex value, so functions returning `undefined` actually return `null`.
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const response = await t.query(testApi.returnsNothing, {});
       expect(response).toEqual(null);
       expectTypeOf(response).toExtend<null>();
     });
 
     test("README example", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const userId = await t.mutation(testApi.generateUserId);
       const response = await t.query(testApi.myComplexQuery, {
         userId,
@@ -430,9 +430,9 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
     });
   });
 
-  describe("skipConvexValidation", () => {
-    test("zCustomQuery with skipConvexValidation", async () => {
-      const t = convexTest(schema, modules);
+  describe("skipBijectionValidation", () => {
+    test("zCustomQuery with skipBijectionValidation", async () => {
+      const t = bijectionTest(schema, modules);
       const args = {
         name: "Alice",
         age: 30,
@@ -440,7 +440,7 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
         extraArg: "extraArg",
       };
       const response = await t.query(
-        testApi.testQueryWithSkipConvexValidation,
+        testApi.testQueryWithSkipBijectionValidation,
         args,
       );
       expect(response).toMatchObject({
@@ -448,10 +448,10 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
         doubledAge: 60,
       });
     });
-    test("throwing ConvexError on zod arg validation", async () => {
-      const t = convexTest(schema, modules);
+    test("throwing BijectionError on zod arg validation", async () => {
+      const t = bijectionTest(schema, modules);
       await expect(
-        t.query(testApi.testQueryWithSkipConvexValidation, {
+        t.query(testApi.testQueryWithSkipBijectionValidation, {
           name: 123,
         } as any),
       ).rejects.toThrowError(
@@ -471,7 +471,7 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
   });
   describe("transform", () => {
     test("calling a function with synchronous transforms in arguments and return values", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const response = await t.query(testApi.transform, {
         count: 5,
         items: ["hello", "world"],
@@ -496,7 +496,7 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
     });
 
     test("calling a function with asynchronous transforms in arguments and return values", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const response = await t.query(testApi.transformAsync, {
         count: 5,
         items: ["hello", "world"],
@@ -517,7 +517,7 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
 
   describe("codec", () => {
     test("calling a function with codecs in arguments and return values", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       const response = await t.query(testApi.codec, {
         encodedNumber: "10", // string input, decoded to number
         encodedString: 5, // number input, decoded to string
@@ -540,8 +540,8 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
       >();
     });
 
-    test("calling a function with wrong argument types throws ConvexError", async () => {
-      const t = convexTest(schema, modules);
+    test("calling a function with wrong argument types throws BijectionError", async () => {
+      const t = bijectionTest(schema, modules);
 
       // Test with values that pass Convex validation but fail Zod validation
       await expect(
@@ -565,7 +565,7 @@ describe("zCustomQuery, zCustomMutation, zCustomAction", () => {
     });
 
     test("it rejects incorrect argument types at compile and runtime", async () => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
 
       await expect(
         t.query(testApi.codec, {
@@ -667,7 +667,7 @@ const testApiCustom: ApiFromModules<{
 
 describe("zCustomQuery customizations", () => {
   test("it can override args and ctx", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     const args = {
       overridenArg: null,
       requiredArg: "requiredArg",

@@ -13,27 +13,27 @@ import {
   typedV,
   ValidationError,
 } from "../validators.js";
-import { convexTest } from "convex-test";
+import { bijectionTest } from "@bijectionhq/test";
 import type {
   ApiFromModules,
   DataModelFromSchemaDefinition,
   MutationBuilder,
   QueryBuilder,
-} from "convex/server";
+} from "bijection/server";
 import {
   anyApi,
   defineSchema,
   defineTable,
   internalMutationGeneric,
   internalQueryGeneric,
-} from "convex/server";
+} from "bijection/server";
 import {
   type GenericId,
   v,
   type Infer,
   type ObjectType,
   VString,
-} from "convex/values";
+} from "bijection/values";
 import { assertType, describe, expect, expectTypeOf, test } from "vitest";
 import { modules } from "./setup.test.js";
 import { getOrThrow } from "./relationships.js";
@@ -175,7 +175,7 @@ const testApi: ApiFromModules<{
 }>["fns"] = anyApi["validators.test"] as any;
 
 test("vv generates the right types for objects", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const docId = await t.run((ctx) => ctx.db.insert("kitchenSink", valid));
   const doc = await t.query(testApi.getSink, { docId });
   expect(doc).toBeDefined();
@@ -250,7 +250,7 @@ describe("addFieldsToValidator", () => {
 });
 
 test("vv generates the right types for unions", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const docId = await t.run((ctx) =>
     ctx.db.insert("unionTable", { foo: "foo" }),
   );
@@ -261,7 +261,7 @@ test("vv generates the right types for unions", async () => {
 });
 
 test("doc validator adds fields", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   await t.mutation(testApi.toDoc, {});
   const userDoc = doc(schema, "users");
   expect(userDoc.fields.tokenIdentifier).toBeDefined();
@@ -288,7 +288,7 @@ test("doc validator adds fields", async () => {
 });
 
 test("validators preserve things when they're set", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const id = await t.run((ctx) => {
     return ctx.db.insert("users", { tokenIdentifier: "" });
   });
@@ -299,7 +299,7 @@ test("validators preserve things when they're set", async () => {
 });
 
 test("validators allow things when they're unset", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   // optional things are unset
   const obj = {
     name: "test",
@@ -321,7 +321,7 @@ test("validators allow things when they're unset", async () => {
 });
 
 test("validators disallow things when they're wrong", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   await expect(async () => {
     await t.query(testApi.echo, {} as ExampleFields);
   }).rejects.toThrowError("Validator error");
@@ -447,7 +447,7 @@ describe("validate", () => {
         someArray: ["string", "other string"],
       }),
     ).toBe(true);
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       const userId = await ctx.db.insert("users", { tokenIdentifier: "test" });
       expect(validate(idValidator, userId, { db: ctx.db })).toBe(true);
@@ -457,7 +457,7 @@ describe("validate", () => {
 
   test("validates system table id validator", async () => {
     const storageIdValidator = v.id("_storage");
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       const storageId = await ctx.storage.store(new Blob(["test"]));
       expect(validate(storageIdValidator, storageId, { db: ctx.db })).toBe(

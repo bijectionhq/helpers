@@ -1,19 +1,19 @@
 import { customCtx, customMutation } from "./customFunctions.js";
 import { Triggers, writerWithTriggers } from "./triggers.js";
 import { wrapDatabaseWriter } from "./rowLevelSecurity.js";
-import { convexTest } from "convex-test";
+import { bijectionTest } from "@bijectionhq/test";
 import type {
   ApiFromModules,
   DataModelFromSchemaDefinition,
   MutationBuilder,
-} from "convex/server";
+} from "bijection/server";
 import {
   anyApi,
   defineSchema,
   defineTable,
   mutationGeneric,
-} from "convex/server";
-import { v } from "convex/values";
+} from "bijection/server";
+import { v } from "bijection/values";
 import { expect, test } from "vitest";
 import { modules } from "./setup.test.js";
 
@@ -197,7 +197,7 @@ const testApi: ApiFromModules<{
 }>["fns"] = anyApi["triggers.test"] as any;
 
 test("trigger denormalizes field", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const userId = await t.mutation(testApi.createUser, {
     firstName: "John",
     lastName: "Doe",
@@ -210,7 +210,7 @@ test("trigger denormalizes field", async () => {
 });
 
 test("trigger with explicit IDs denormalizes field", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const userId = await t.mutation(testApi.createUserExplicit, {
     firstName: "John",
     lastName: "Doe",
@@ -222,7 +222,7 @@ test("trigger with explicit IDs denormalizes field", async () => {
 });
 
 test("trigger with wrong usage of explicit IDs fails", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   await expect(
     t.mutation(testApi.createUserExplicitIncorrectTable, {
       firstName: "John",
@@ -234,7 +234,7 @@ test("trigger with wrong usage of explicit IDs fails", async () => {
 });
 
 test("create, update and delete", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
 
   async function getUserCount() {
     return await t.run(async (ctx) => {
@@ -271,7 +271,7 @@ test("create, update and delete", async () => {
 });
 
 test("triggers.wrapDB preserves `this` binding for RLS-wrapped db", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const result = await t.mutation(
     testApi.createUserAndReadBackWithRlsWrappedDb,
     {
@@ -286,7 +286,7 @@ test("triggers.wrapDB preserves `this` binding for RLS-wrapped db", async () => 
 });
 
 test("writes to a table without triggers skip the trigger path", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   await t.run(async (ctx) => {
     const reads: string[] = [];
     const innerDb = new Proxy(ctx.db, {

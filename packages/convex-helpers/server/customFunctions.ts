@@ -15,7 +15,7 @@ import type {
   ObjectType,
   PropertyValidators,
   Validator,
-} from "convex/values";
+} from "bijection/values";
 import type {
   ActionBuilder,
   ArgsArrayForOptionalValidator,
@@ -33,7 +33,7 @@ import type {
   RegisteredMutation,
   RegisteredQuery,
   ReturnValueForOptionalValidator,
-} from "convex/server";
+} from "bijection/server";
 import { omit, pick } from "../index.js";
 import { addFieldsToValidator } from "../validators.js";
 

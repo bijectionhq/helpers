@@ -1,11 +1,11 @@
-import type { GenericDocument } from "convex/server";
-import { defineTable, defineSchema } from "convex/server";
-import { convexTest } from "convex-test";
+import type { GenericDocument } from "bijection/server";
+import { defineTable, defineSchema } from "bijection/server";
+import { bijectionTest } from "@bijectionhq/test";
 import { expect, test } from "vitest";
 import type { IndexKey } from "./stream.js";
 import { mergedStream, stream, streamIndexRange } from "./stream.js";
 import { modules } from "./setup.test.js";
-import { convexToJson, getDocumentSize, v } from "convex/values";
+import { bijectionToJson, getDocumentSize, v } from "bijection/values";
 
 const schema = defineSchema({
   foo: defineTable({
@@ -52,7 +52,7 @@ for (let a = 0; a < 3; a++) {
 
 describe("reflect", () => {
   test("reflection", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       const query = stream(ctx.db, schema)
         .query("foo")
@@ -71,7 +71,7 @@ describe("reflect", () => {
   });
 
   test("reflection as query", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 3 });
@@ -91,7 +91,7 @@ describe("reflect", () => {
 
 describe("stream", () => {
   test("reflection as stream", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 3 });
@@ -117,7 +117,7 @@ describe("stream", () => {
   });
 
   test("query round trip", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 4 });
@@ -138,7 +138,7 @@ describe("stream", () => {
   });
 
   test("query round trip with pagination", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       // put first out of order just in case
       await ctx.db.insert("foo", { a: 1, b: 4, c: 3 });
@@ -174,7 +174,7 @@ describe("stream", () => {
   });
 
   test("continuCursor respects the order of the stream", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       // put first out of order just in case
       await ctx.db.insert("foo", { a: 1, b: 1, c: 1 });
@@ -214,7 +214,7 @@ describe("stream", () => {
   });
 
   test("query round trip with pagination one item at a time", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       // put first out of order just in case
       await ctx.db.insert("foo", { a: 1, b: 3, c: 1 });
@@ -249,7 +249,7 @@ describe("stream", () => {
   });
 
   test("merge streams", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 3 }); // excluded
@@ -295,7 +295,7 @@ describe("stream", () => {
   });
 
   test("merge streams desc", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 3 });
@@ -321,7 +321,7 @@ describe("stream", () => {
   });
 
   test("filter stream", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 }); // excluded by index
       await ctx.db.insert("foo", { a: 1, b: 3, c: 3 }); // excluded by filter
@@ -368,7 +368,7 @@ describe("stream", () => {
   });
 
   test("no SplitRecommended without endCursor", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       for (let i = 1; i <= 20; i++) {
         await ctx.db.insert("foo", { a: 1, b: i, c: i % 2 === 0 ? 1 : 0 });
@@ -388,7 +388,7 @@ describe("stream", () => {
   });
 
   test("SplitRecommended when endCursor set and page exceeds numItems + 1", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       for (let i = 1; i <= 10; i++) {
         await ctx.db.insert("foo", { a: 1, b: i, c: i % 2 === 0 ? 1 : 0 });
@@ -398,7 +398,7 @@ describe("stream", () => {
         .withIndex("abc", (q) => q.eq("a", 1))
         .filterWith(async (doc) => doc.c === 1);
 
-      const endCursor = JSON.stringify(convexToJson([1, 100, 0]));
+      const endCursor = JSON.stringify(bijectionToJson([1, 100, 0]));
       const page = await query.paginate({
         numItems: 3,
         cursor: null,
@@ -412,7 +412,7 @@ describe("stream", () => {
   });
 
   test("SplitRecommended when scan approaches scan limit regardless of endCursor", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       // SOFT_MAX_SCAN_LEN = 32000 / 2 = 16000. Insert that many docs where
       // only a handful match the filter, so indexKeys hits the soft max while
@@ -438,7 +438,7 @@ describe("stream", () => {
   });
 
   test("SplitRequired fires with filterWith when maximumRowsRead is hit", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       for (let i = 1; i <= 20; i++) {
         await ctx.db.insert("foo", { a: 3, b: i, c: i % 5 === 0 ? 1 : 0 });
@@ -462,7 +462,7 @@ describe("stream", () => {
   });
 
   test("merge orderBy streams", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 3 });
@@ -520,7 +520,7 @@ describe("stream", () => {
   });
 
   test("merge streams between indexes", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 4 });
@@ -543,7 +543,7 @@ describe("stream", () => {
   });
 
   test("map stream", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 4 });
@@ -569,7 +569,7 @@ describe("stream", () => {
   });
 
   test("flatMap stream", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 4 });
@@ -602,7 +602,7 @@ describe("stream", () => {
   test.each(["asc", "desc"] as const)(
     "flatMap pagination preserves later outer items (%s)",
     async (order) => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       await t.run(async (ctx) => {
         // The join keys run opposite to the outer stream's ordering.
         for (const a of [1, 2, 3]) {
@@ -698,7 +698,7 @@ describe("stream", () => {
   test.each(["asc", "desc"] as const)(
     "flatMap resumes merged inner streams after a skipped outer item (%s)",
     async (order) => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       await t.run(async (ctx) => {
         for (const a of [1, 2, 3]) {
           await ctx.db.insert("foo", { a, b: 0, c: a });
@@ -744,7 +744,7 @@ describe("stream", () => {
   );
 
   test("streamIndexRange returns correct subset", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 4, c: 0 });
       await ctx.db.insert("foo", { a: 1, b: 5, c: 0 });
@@ -768,7 +768,7 @@ describe("stream", () => {
   });
 
   test("paginate with 0 numItems", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       const query = stream(ctx.db, schema)
         .query("foo")
@@ -791,7 +791,7 @@ describe("stream", () => {
   });
 
   test("paginate respects endCursor", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 1, c: 0 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 0 });
@@ -800,7 +800,7 @@ describe("stream", () => {
         .query("foo")
         .withIndex("abc", (q) => q.eq("a", 1))
         .order("asc");
-      const endCursor = JSON.stringify(convexToJson([1, 2, 0]));
+      const endCursor = JSON.stringify(bijectionToJson([1, 2, 0]));
       const page = await query.paginate({
         numItems: 10,
         cursor: null,
@@ -817,7 +817,7 @@ describe("stream", () => {
     });
   });
   test("paginate cant reconnect cursors with endCursor", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 1, c: 0 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 0 });
@@ -849,7 +849,7 @@ describe("stream", () => {
     });
   });
   test("flatMap ignores null outer items", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       const result = await stream(ctx.db, schema)
@@ -863,7 +863,7 @@ describe("stream", () => {
   });
 
   test("distinct stream", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 5 });
@@ -888,7 +888,7 @@ describe("stream", () => {
   test.each([{ order: "asc" }, { order: "desc" }] as const)(
     "distinct pagination works",
     async ({ order }) => {
-      const t = convexTest(schema, modules);
+      const t = bijectionTest(schema, modules);
       await t.run(async (ctx) => {
         const values = [
           { a: 1, b: 2, c: 3 },
@@ -949,7 +949,7 @@ describe("stream", () => {
   SELECT * FROM foo WHERE a = 1 AND b > 1 AND b < 5 AND c > 3
   */
   test("loose index scan", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 1, c: 4 }); // excluded by outer
       await ctx.db.insert("foo", { a: 1, b: 2, c: 1 }); // excluded by inner
@@ -993,7 +993,7 @@ describe("stream", () => {
         b: v.number(),
       }).index("ab", ["a", "b"]),
     });
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2 });
       await ctx.db.insert("foo", { a: undefined, b: 3 });
@@ -1030,7 +1030,7 @@ describe("stream", () => {
         b: v.number(),
       }).index("ab", ["a", "b"]),
     });
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: undefined, b: 1 });
       await ctx.db.insert("foo", { a: "undefined", b: 2 });
@@ -1078,7 +1078,7 @@ describe("bandwidth tracking", () => {
   }
 
   test("iterWithKeys tracks bandwidth when enabled", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 4 });
@@ -1107,7 +1107,7 @@ describe("bandwidth tracking", () => {
   });
 
   test("basic stream paginate respects maximumBytesRead", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 1, c: 0 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 0 });
@@ -1151,7 +1151,7 @@ describe("bandwidth tracking", () => {
   });
 
   test("filterWith tracks bandwidth for filtered-out docs", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 1, c: 0 }); // will be filtered out
       await ctx.db.insert("foo", { a: 1, b: 2, c: 0 }); // will be filtered out
@@ -1190,7 +1190,7 @@ describe("bandwidth tracking", () => {
   });
 
   test("mergedStream tracks bandwidth for pre-fetched docs", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 1, c: 0 });
       await ctx.db.insert("foo", { a: 2, b: 2, c: 0 });
@@ -1242,7 +1242,7 @@ describe("bandwidth tracking", () => {
   });
 
   test("map stream tracks bandwidth of original docs", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 1, c: 0 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 0 });
@@ -1276,7 +1276,7 @@ describe("bandwidth tracking", () => {
   });
 
   test("flatMap tracks bandwidth for outer and inner docs", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 3, c: 4 });
@@ -1332,7 +1332,7 @@ describe("bandwidth tracking", () => {
   });
 
   test("distinct stream tracks bandwidth", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 5 }); // skipped by distinct
@@ -1369,7 +1369,7 @@ describe("bandwidth tracking", () => {
   });
 
   test("streamIndexRange tracks bandwidth", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 4, c: 0 });
       await ctx.db.insert("foo", { a: 1, b: 5, c: 0 });
@@ -1402,7 +1402,7 @@ describe("bandwidth tracking", () => {
   });
 
   test("pagination continues correctly after maximumBytesRead", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 1, c: 0 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 0 });

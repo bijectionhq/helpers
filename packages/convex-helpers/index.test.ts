@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { v } from "bijection/values";
 import { withoutSystemFields, pick, omit } from "./index.js";
 import { test, expect, expectTypeOf } from "vitest";
 

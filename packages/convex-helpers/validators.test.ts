@@ -1,8 +1,8 @@
-import { v } from "convex/values";
+import { v } from "bijection/values";
 import { describe, expect, test, expectTypeOf } from "vitest";
 import { vRequired, type VRequired, validate, parse } from "./validators.js";
 import type { Equals } from "./index.js";
-import type { Validator } from "convex/values";
+import type { Validator } from "bijection/values";
 
 describe("validate with undefined values", () => {
   test("should skip validation for undefined values in records", () => {

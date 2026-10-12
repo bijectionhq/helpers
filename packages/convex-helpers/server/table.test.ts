@@ -1,20 +1,20 @@
 import { omit, pick, pruneNull } from "../index.js";
 import { Table } from "../server.js";
 import { partial } from "../validators.js";
-import { convexTest } from "convex-test";
+import { bijectionTest } from "@bijectionhq/test";
 import type {
   ApiFromModules,
   DataModelFromSchemaDefinition,
   MutationBuilder,
   QueryBuilder,
-} from "convex/server";
+} from "bijection/server";
 import {
   anyApi,
   defineSchema,
   internalMutationGeneric,
   internalQueryGeneric,
-} from "convex/server";
-import { v } from "convex/values";
+} from "bijection/server";
+import { v } from "bijection/values";
 import { assertType, expect, test } from "vitest";
 import { modules } from "./setup.test.js";
 
@@ -116,7 +116,7 @@ const testApi: ApiFromModules<{
 }>["fns"] = anyApi["table.test"] as any;
 
 test("crud for table", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const id = await t.mutation(testApi.insert, {
     foo: "",
     bar: null,
@@ -142,7 +142,7 @@ test("crud for table", async () => {
 });
 
 test("all at once", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const id = await t.mutation(testApi.insert, {
     foo: "foo",
     bar: 123,

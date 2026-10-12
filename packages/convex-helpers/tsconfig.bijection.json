@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "./dist",
+    "rootDir": "."
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.*",
+    "server/_generated",
+    "cli"
+  ],
+  "include": [
+    "index.ts",
+    "validators.ts",
+    "standardSchema.ts",
+    "react.ts",
+    "server/pagination.ts",
+    "server/stream.ts"
+  ]
+}

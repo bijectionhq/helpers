@@ -1,7 +1,7 @@
 import fs from "fs";
 import { spawnSync } from "child_process";
 import chalk from "chalk";
-import type { ValidatorJSON } from "convex/values";
+import type { ValidatorJSON } from "bijection/values";
 import path from "path";
 import os from "os";
 
@@ -42,7 +42,7 @@ export function getFunctionSpec(prod?: boolean, filePath?: string) {
       const flags = prod ? ["--prod"] : [];
       const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
       const extraOpts = process.platform === "win32" ? { shell: true } : {};
-      const result = spawnSync(npxCmd, ["convex", "function-spec", ...flags], {
+      const result = spawnSync(npxCmd, ["bijection", "function-spec", ...flags], {
         stdio: ["inherit", outputFd, "pipe"],
         encoding: "utf-8",
         ...extraOpts,

@@ -3,22 +3,22 @@ import { z as z3 } from "zod/v3";
 import * as z4 from "zod/v4";
 import * as z4Mini from "zod/v4/mini";
 import { describe, expect, expectTypeOf, test } from "vitest";
-import { v, type Infer } from "convex/values";
+import { v, type Infer } from "bijection/values";
 import type { Equals } from "../index.js";
 import {
-  zodToConvex,
-  zodOutputToConvex,
-  zodToConvexFields,
-  zodOutputToConvexFields,
+  zodToBijection,
+  zodOutputToBijection,
+  zodToBijectionFields,
+  zodOutputToBijectionFields,
   withSystemFields,
 } from "./zod.js";
 
 function assert<_T extends true>() {}
 
-describe("zodToConvex", () => {
+describe("zodToBijection", () => {
   test("works with Zod 3", () => {
     const zodValidator = z3.string();
-    const result = zodToConvex(zodValidator);
+    const result = zodToBijection(zodValidator);
 
     // Runtime check - verify the validator structure
     expect(result).toEqual(v.string());
@@ -30,7 +30,7 @@ describe("zodToConvex", () => {
 
   test("works with Zod 4", () => {
     const zodValidator = z4.string();
-    const result = zodToConvex(zodValidator);
+    const result = zodToBijection(zodValidator);
 
     // Runtime check - verify the validator structure
     expect(result).toEqual(v.string());
@@ -42,7 +42,7 @@ describe("zodToConvex", () => {
 
   test("works with Zod 4 Mini", () => {
     const zodValidator = z4Mini.string();
-    const result = zodToConvex(zodValidator);
+    const result = zodToBijection(zodValidator);
 
     // Runtime check - verify the validator structure
     expect(result).toEqual(v.string());
@@ -53,10 +53,10 @@ describe("zodToConvex", () => {
   });
 });
 
-describe("zodOutputToConvex", () => {
+describe("zodOutputToBijection", () => {
   test("works with Zod 3", () => {
     const zodValidator = z3.string().transform((s) => s.length);
-    const result = zodOutputToConvex(zodValidator);
+    const result = zodOutputToBijection(zodValidator);
 
     // Runtime check - transforms return v.any() because transforms can't be represented in Convex
     expect(result).toEqual(v.any());
@@ -68,7 +68,7 @@ describe("zodOutputToConvex", () => {
 
   test("works with Zod 4", () => {
     const zodValidator = z4.string().transform((s) => s.length);
-    const result = zodOutputToConvex(zodValidator);
+    const result = zodOutputToBijection(zodValidator);
 
     // Runtime check - transforms return v.any() because transforms can't be represented in Convex
     expect(result).toEqual(v.any());
@@ -82,7 +82,7 @@ describe("zodOutputToConvex", () => {
     // Zod 4 Mini doesn't support transform, so we test with a simple validator
     // and verify that the output type matches the input type
     const zodValidator = z4Mini.string();
-    const result = zodOutputToConvex(zodValidator);
+    const result = zodOutputToBijection(zodValidator);
 
     // Runtime check - verify the validator structure
     expect(result).toEqual(v.string());
@@ -93,13 +93,13 @@ describe("zodOutputToConvex", () => {
   });
 });
 
-describe("zodToConvexFields", () => {
+describe("zodToBijectionFields", () => {
   test("works with Zod 3", () => {
     const zodFields = {
       name: z3.string(),
       age: z3.number().optional(),
     };
-    const result = zodToConvexFields(zodFields);
+    const result = zodToBijectionFields(zodFields);
 
     // Runtime check
     expect(result.name).toEqual(v.string());
@@ -124,7 +124,7 @@ describe("zodToConvexFields", () => {
       name: z4.string(),
       age: z4.number().optional(),
     };
-    const result = zodToConvexFields(zodFields);
+    const result = zodToBijectionFields(zodFields);
 
     // Runtime check
     expect(result.name).toEqual(v.string());
@@ -149,7 +149,7 @@ describe("zodToConvexFields", () => {
       name: z4Mini.string(),
       age: z4Mini.optional(z4Mini.number()),
     };
-    const result = zodToConvexFields(zodFields);
+    const result = zodToBijectionFields(zodFields);
 
     // Runtime check
     expect(result.name).toEqual(v.string());
@@ -170,13 +170,13 @@ describe("zodToConvexFields", () => {
   });
 });
 
-describe("zodOutputToConvexFields", () => {
+describe("zodOutputToBijectionFields", () => {
   test("works with Zod 3", () => {
     const zodFields = {
       name: z3.string().default("Unknown"),
       count: z3.string().transform((s) => parseInt(s, 10)),
     };
-    const result = zodOutputToConvexFields(zodFields);
+    const result = zodOutputToBijectionFields(zodFields);
 
     // Runtime check
     // For default, output type should be string (not optional)
@@ -196,7 +196,7 @@ describe("zodOutputToConvexFields", () => {
       name: z4.string().default("Unknown"),
       count: z4.string().transform((s) => parseInt(s, 10)),
     };
-    const result = zodOutputToConvexFields(zodFields);
+    const result = zodOutputToBijectionFields(zodFields);
 
     // Runtime check
     // For default, output type should be string (not optional)
@@ -217,7 +217,7 @@ describe("zodOutputToConvexFields", () => {
       name: z4Mini.string(),
       count: z4Mini.number(),
     };
-    const result = zodOutputToConvexFields(zodFields);
+    const result = zodOutputToBijectionFields(zodFields);
 
     // Runtime check
     expect(result.name).toEqual(v.string());

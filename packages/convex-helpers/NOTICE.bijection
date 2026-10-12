@@ -1,0 +1,4 @@
+Derived from get-convex/convex-helpers at d9dedf7a83259aa677a390a3e50a641218d10170.
+Original copyright, LICENSE and NOTICE are retained.
+Bijection changes module imports, public names and package assembly.
+Native run APIs use the existing engine; no second execution ledger is added.

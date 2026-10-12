@@ -1,11 +1,11 @@
 import type { BetterOmit, EmptyObject } from "./index.js";
-import type { ConvexClient, ConvexHttpClient } from "convex/browser";
-import type { FunctionArgs, FunctionReturnType } from "convex/server";
+import type { BijectionClient, BijectionHttpClient } from "bijection/browser";
+import type { FunctionArgs, FunctionReturnType } from "bijection/server";
 import type {
   FunctionReference,
   FunctionReference_future,
-} from "convex/server";
-import type { Value } from "convex/values";
+} from "bijection/server";
+import type { Value } from "bijection/values";
 
 export type ArgsArray<
   Injected extends Record<string, Value>,
@@ -22,18 +22,18 @@ export type ArgsArray<
  *
  * e.g.
  * ```ts
- * const client = new ConvexClient(process.env.CONVEX_URL!);
+ * const client = new BijectionClient(process.env.BIJECTION_URL!);
  * const apiClient = withArgs(client, { apiKey: process.env.API_KEY! });
  *
  * const result = await apiClient.query(api.foo.bar, { ...other args });
  * ```
  *
- * @param client A ConvexClient instance
+ * @param client A BijectionClient instance
  * @param injectedArgs Arguments to inject into each query/mutation/action call.
  * @returns { query, mutation, action } functions with the injected arguments
  */
 export function withArgs<A extends Record<string, Value>>(
-  client: ConvexClient | ConvexHttpClient,
+  client: BijectionClient | BijectionHttpClient,
   injectedArgs: A,
 ) {
   return {

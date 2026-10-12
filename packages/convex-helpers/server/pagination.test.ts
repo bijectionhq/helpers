@@ -1,12 +1,12 @@
-import type { GenericDocument } from "convex/server";
-import { defineTable, defineSchema } from "convex/server";
-import { convexTest } from "convex-test";
+import type { GenericDocument } from "bijection/server";
+import { defineTable, defineSchema } from "bijection/server";
+import { bijectionTest } from "@bijectionhq/test";
 import { expect, test } from "vitest";
 import type { IndexKey } from "./pagination.js";
 import { getPage, paginator } from "./pagination.js";
 import { modules } from "./setup.test.js";
-import type { GenericId } from "convex/values";
-import { v } from "convex/values";
+import type { GenericId } from "bijection/values";
+import { v } from "bijection/values";
 
 const schema = defineSchema({
   foo: defineTable({
@@ -37,7 +37,7 @@ describe("manual pagination", () => {
   beforeEach(() => {});
   afterEach(() => {});
   test("single doc by creation time", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       const { page, indexKeys, hasMore } = await getPage(ctx, { table: "foo" });
@@ -48,7 +48,7 @@ describe("manual pagination", () => {
   });
 
   test("single doc by abc", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       const { page, indexKeys, hasMore } = await getPage(ctx, {
@@ -63,7 +63,7 @@ describe("manual pagination", () => {
   });
 
   test("middle page with exclusive/inclusive bounds", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       for (const doc of MANY_DOCS) {
         await ctx.db.insert("foo", doc);
@@ -115,7 +115,7 @@ describe("manual pagination", () => {
   });
 
   test("three pages with refreshes", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       for (const doc of MANY_DOCS) {
         await ctx.db.insert("foo", doc);
@@ -198,7 +198,7 @@ describe("manual pagination", () => {
   });
 
   test("skip forward and scroll back", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       for (const doc of MANY_DOCS) {
         await ctx.db.insert("foo", doc);
@@ -249,7 +249,7 @@ describe("manual pagination", () => {
 
 describe("paginator", () => {
   test("full table scan", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 4 });
@@ -268,7 +268,7 @@ describe("paginator", () => {
   });
 
   test("paginated table scan", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 2, c: 3 });
       await ctx.db.insert("foo", { a: 1, b: 2, c: 4 });
@@ -293,7 +293,7 @@ describe("paginator", () => {
   });
 
   test("index range", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 5, c: 1 });
       await ctx.db.insert("foo", { a: 1, b: 6, c: 1 });
@@ -327,7 +327,7 @@ describe("paginator", () => {
   });
 
   test("paginated index range desc", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 5, c: 1 });
       await ctx.db.insert("foo", { a: 1, b: 5, c: 2 });
@@ -371,7 +371,7 @@ describe("paginator", () => {
   });
 
   test("invalid index range", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       expect(() =>
         paginator(ctx.db, schema)
@@ -397,7 +397,7 @@ describe("paginator", () => {
   });
 
   test("endCursor", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.run(async (ctx) => {
       await ctx.db.insert("foo", { a: 1, b: 5, c: 1 });
       await ctx.db.insert("foo", { a: 1, b: 6, c: 1 });

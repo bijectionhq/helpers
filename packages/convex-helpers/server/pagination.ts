@@ -1,4 +1,4 @@
-import type { Value } from "convex/values";
+import type { Value } from "bijection/values";
 import type {
   DataModelFromSchemaDefinition,
   DocumentByName,
@@ -8,7 +8,7 @@ import type {
   NamedTableInfo,
   SchemaDefinition,
   TableNamesInDataModel,
-} from "convex/server";
+} from "bijection/server";
 import {
   getIndexFields,
   StreamDatabaseReader,

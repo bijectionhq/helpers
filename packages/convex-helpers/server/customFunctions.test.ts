@@ -9,7 +9,7 @@ import {
 import { wrapDatabaseWriter } from "./rowLevelSecurity.js";
 import type { SessionId } from "./sessions.js";
 import { vSessionId } from "./sessions.js";
-import { convexTest } from "convex-test";
+import { bijectionTest } from "@bijectionhq/test";
 import type {
   ApiFromModules,
   Auth,
@@ -20,7 +20,7 @@ import type {
   MutationBuilder,
   QueryBuilder,
   RegisteredQuery,
-} from "convex/server";
+} from "bijection/server";
 import {
   actionGeneric,
   anyApi,
@@ -28,8 +28,8 @@ import {
   defineTable,
   mutationGeneric,
   queryGeneric,
-} from "convex/server";
-import { v } from "convex/values";
+} from "bijection/server";
+import { v } from "bijection/values";
 import {
   afterEach,
   assertType,
@@ -456,7 +456,7 @@ const testApi: ApiFromModules<{
 }>["fns"] = anyApi["customFunctions.test"] as any;
 
 test("custom function with user auth", async () => {
-  const t = convexTest(schema, modules);
+  const t = bijectionTest(schema, modules);
   const userId = await t.run(async (ctx) => {
     return ctx.db.insert("users", { tokenIdentifier: "foo" });
   });
@@ -506,7 +506,7 @@ describe("custom functions with api auth", () => {
     process.env.API_KEY = originalAPIKey;
   });
   test("api auth", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await t.mutation(testApi.fnCalledFromMyBackend, {
       apiKey,
       tokenIdentifier: "bar",
@@ -570,7 +570,7 @@ describe("custom functions", () => {
   });
 
   test("add args", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.add, {})).toMatchObject({
       argsA: "hi",
     });
@@ -583,7 +583,7 @@ describe("custom functions", () => {
   });
 
   test("add ctx", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.addC, {})).toMatchObject({
       ctxA: "hi",
     });
@@ -602,14 +602,14 @@ describe("custom functions", () => {
   });
 
   test("consume arg, add to ctx", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.consume, { a: "foo" })).toMatchObject({
       ctxA: "foo",
     });
   });
 
   test("pass through arg + ctx", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.passThrough, { a: "foo" })).toMatchObject({
       ctxA: "foo",
       argsA: "foo",
@@ -617,7 +617,7 @@ describe("custom functions", () => {
   });
 
   test("modify arg type", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.modify, { a: "foo" })).toMatchObject({
       ctxA: "foo",
       argsA: 123,
@@ -625,14 +625,14 @@ describe("custom functions", () => {
   });
 
   test("redefine arg", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.redefine, { a: "foo" })).toMatchObject({
       argsA: "foo",
     });
   });
 
   test("refined arg", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.refined, { a: "foo" })).toMatchObject({
       argsA: "foo",
     });
@@ -642,7 +642,7 @@ describe("custom functions", () => {
   });
 
   test("still validates args", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await expect(() =>
       t.query(testApi.redefine, { a: 3 as any }),
     ).rejects.toThrow("Validator error: Expected `string`");
@@ -651,7 +651,7 @@ describe("custom functions", () => {
 
 describe("nested custom functions", () => {
   test("add args and ctx", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(
       await t.query(testApi.outerAdds, { a: "hi", outer: "outer" }),
     ).toMatchObject({
@@ -662,14 +662,14 @@ describe("nested custom functions", () => {
     });
   });
   test("remove args", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(
       await t.query(testApi.outerRemoved, { a: "hi", outer: "bye" }),
     ).toStrictEqual({ a: "hi" });
   });
 
   test("still validates args", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     await expect(() =>
       t.query(testApi.outerAdds, { a: 3 as any, outer: "" }),
     ).rejects.toThrow("Validator error: Expected `string`");
@@ -678,7 +678,7 @@ describe("nested custom functions", () => {
 
 describe("extra args", () => {
   test("add extra args", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     expect(await t.query(testApi.extraArgQuery, { a: "foo" })).toMatchObject({
       ctxA: "foo",
     });
@@ -687,7 +687,7 @@ describe("extra args", () => {
 
 describe("finally callback", () => {
   test("finally callback is called with result and context", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     const finallyMock = vi.fn();
 
     const withFinally = customQuery(query, {
@@ -738,7 +738,7 @@ describe("finally callback", () => {
   });
 
   test("finally callback with mutation", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     const finallyMock = vi.fn();
 
     const withFinally = customMutation(mutation, {
@@ -768,7 +768,7 @@ describe("finally callback", () => {
   });
 
   test("finally callback with action", async () => {
-    const t = convexTest(schema, modules);
+    const t = bijectionTest(schema, modules);
     const finallyMock = vi.fn();
 
     const withFinally = customAction(action, {

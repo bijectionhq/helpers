@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { FunctionReference } from "convex/server";
-import type { ConvexClient } from "convex/browser";
+import type { FunctionReference } from "bijection/server";
+import type { BijectionClient } from "bijection/browser";
 import { withArgs } from "./browser.js";
 
 describe("withArgs", () => {
-  let mockClient: ConvexClient;
+  let mockClient: BijectionClient;
 
   beforeEach(() => {
     mockClient = {
       query: vi.fn().mockResolvedValue("query-result"),
       mutation: vi.fn().mockResolvedValue("mutation-result"),
       action: vi.fn().mockResolvedValue("action-result"),
-    } as unknown as ConvexClient;
+    } as unknown as BijectionClient;
   });
 
   it("should inject args into query", async () => {

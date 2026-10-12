@@ -7,7 +7,7 @@ import { tsApiSpec } from "./tsApiSpec.js";
 async function main() {
   const program = new Command();
   program
-    .name("convex-helpers")
+    .name("@bijectionhq/helpers")
     .usage("<command> [options]")
     .description("Run scripts in the convex-helpers library.")
     .addCommand(openApiSpec)

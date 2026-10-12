@@ -21,7 +21,7 @@ In `convex/schema.ts` (if you want persistence):
 
 ```ts
 // In convex/schema.ts
-import { migrationsTable } from "convex-helpers/server/migrations";
+import { migrationsTable } from "@bijectionhq/helpers/server/migrations";
 export default defineSchema({
   migrations: migrationsTable,
   // other tables...
@@ -33,7 +33,7 @@ You can pick any table name for this, but it should match `migrationTable` used 
 In `convex/migrations.ts` (or wherever you want to define them):
 
 ```ts
-import { makeMigration } from "convex-helpers/server/migrations";
+import { makeMigration } from "@bijectionhq/helpers/server/migrations";
 import { internalMutation } from "./_generated/server";
 
 const migration = makeMigration(internalMutation, {
@@ -59,7 +59,7 @@ npx convex run migrations:myMigration '{fn: "migrations:myMigration"}'
 Or call it directly within a function:
 
 ```ts
-import { startMigration } from "convex-helpers/server/migrations";
+import { startMigration } from "@bijectionhq/helpers/server/migrations";
 
 //... within a mutation or action
 await startMigration(ctx, internal.migrations.myMigration, {
@@ -71,7 +71,7 @@ await startMigration(ctx, internal.migrations.myMigration, {
 Or define many to run in series (skips already completed migrations / rows):
 
 ```ts
-import { startMigrationsSerially } from "convex-helpers/server/migrations";
+import { startMigrationsSerially } from "@bijectionhq/helpers/server/migrations";
 import { internalMutation } from "./_generated/server";
 
 export default internalMutation(async (ctx) => {
@@ -110,14 +110,14 @@ import type {
   Scheduler,
   SchemaDefinition,
   TableNamesInDataModel,
-} from "convex/server";
+} from "bijection/server";
 import {
   defineTable,
   getFunctionName,
   makeFunctionReference,
-} from "convex/server";
-import type { GenericId, ObjectType } from "convex/values";
-import { v } from "convex/values";
+} from "bijection/server";
+import type { GenericId, ObjectType } from "bijection/values";
+import { v } from "bijection/values";
 import type { ErrorMessage } from "../index.js";
 import { asyncMap } from "../index.js";
 import { pretendRequired } from "../validators.js";
@@ -174,7 +174,7 @@ type MigrationReference =
  * If you don't specify a table, it will not check for active migrations.
  * e.g. in your schema:
  * ```ts
- * import { migrationsTable } from "convex-helpers/server/migrations";
+ * import { migrationsTable } from "@bijectionhq/helpers/server/migrations";
  * export default defineSchema({
  *  migrations: migrationsTable,
  *  // other tables...
@@ -182,7 +182,7 @@ type MigrationReference =
  * ```
  * And in convex/migrations.ts for example:
  * ```ts
- * import { makeMigration } from "convex-helpers/server/migrations";
+ * import { makeMigration } from "@bijectionhq/helpers/server/migrations";
  * import { internalMutation } from "./_generated/server";
  * const migration = makeMigration(internalMutation, {
  *   migrationTable: "migrations",
@@ -252,7 +252,7 @@ export function makeMigration<
    *
    * To call it directly within a function:
    * ```ts
-   * import { startMigration } from "convex-helpers/server/migrations";
+   * import { startMigration } from "@bijectionhq/helpers/server/migrations";
    *
    * // in a mutation or action:
    *   await startMigration(ctx, internal.migrations.myMigration, {
@@ -263,7 +263,7 @@ export function makeMigration<
    *
    * Serially:
    * ```ts
-   * import { startMigrationsSerially } from "convex-helpers/server/migrations";
+   * import { startMigrationsSerially } from "@bijectionhq/helpers/server/migrations";
    *
    * // in a mutation or action:
    *   await startMigrationsSerially(ctx, [

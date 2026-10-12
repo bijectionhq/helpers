@@ -7,10 +7,10 @@
  * To use this helper, create a new Hono app in convex/http.ts like so:
  * ```ts
  * import { Hono } from "hono";
- * import { HonoWithConvex, HttpRouterWithHono } from "convex-helpers/server/hono";
+ * import { HonoWithBijection, HttpRouterWithHono } from "@bijectionhq/helpers/server/hono";
  * import { ActionCtx } from "./_generated/server";
  *
- * const app: HonoWithConvex<ActionCtx> = new Hono();
+ * const app: HonoWithBijection<ActionCtx> = new Hono();
  *
  * app.get("/", async (c) => {
  *   return c.json("Hello world!");
@@ -23,12 +23,12 @@ import type {
   PublicHttpAction,
   RoutableMethod,
   GenericActionCtx,
-} from "convex/server";
+} from "bijection/server";
 import {
   httpActionGeneric,
   HttpRouter,
   ROUTABLE_HTTP_METHODS,
-} from "convex/server";
+} from "bijection/server";
 import { Hono } from "hono";
 export { Hono };
 
@@ -50,7 +50,7 @@ declare global {
  * middleware-driven typed context state (`c.var` / `c.set` / `c.get`) without
  * casting when passing the app to `HttpRouterWithHono`.
  */
-export type HonoWithConvex<
+export type HonoWithBijection<
   ActionCtx extends GenericActionCtx<any>,
   Variables extends Record<string, unknown> = Record<string, never>,
 > = Hono<{
@@ -71,7 +71,7 @@ export type HonoWithConvex<
  * For example:
  *
  * ```
- * const app: HonoWithConvex = new Hono();
+ * const app: HonoWithBijection = new Hono();
  * app.get("/hono/hello", (c) => c.json({ message: "from hono" }));
  *
  * const http = new HttpRouterWithHono(app);
@@ -88,11 +88,11 @@ export class HttpRouterWithHono<
   ActionCtx extends GenericActionCtx<any>,
   Variables extends Record<string, unknown> = Record<string, never>,
 > extends HttpRouter {
-  private _app: HonoWithConvex<ActionCtx, Variables>;
+  private _app: HonoWithBijection<ActionCtx, Variables>;
   private _handler: PublicHttpAction;
   private _handlerInfoCache: Map<any, { method: RoutableMethod; path: string }>;
 
-  constructor(app: HonoWithConvex<ActionCtx, Variables>) {
+  constructor(app: HonoWithBijection<ActionCtx, Variables>) {
     super();
     this._app = app;
     // Single Convex httpEndpoint handler that just forwards the request to the

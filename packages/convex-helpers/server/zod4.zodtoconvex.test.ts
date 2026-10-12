@@ -15,15 +15,15 @@ import {
   VOptional,
   VString,
   VUnion,
-} from "convex/values";
+} from "bijection/values";
 import {
-  zodToConvex,
+  zodToBijection,
   zid,
-  ConvexValidatorFromZod,
-  ConvexValidatorFromZodOutput,
-  zodOutputToConvex,
-  zodToConvexFields,
-  zodOutputToConvexFields,
+  BijectionValidatorFromZod,
+  BijectionValidatorFromZodOutput,
+  zodOutputToBijection,
+  zodToBijectionFields,
+  zodOutputToBijectionFields,
   withSystemFields,
   Zid,
 } from "./zod4";
@@ -34,57 +34,57 @@ import {
   defineTable,
   type DataModelFromSchemaDefinition,
   type DocumentByName,
-} from "convex/server";
+} from "bijection/server";
 
-describe("zodToConvex + zodOutputToConvex", () => {
+describe("zodToBijection + zodOutputToBijection", () => {
   test("id", () => {
-    testZodToConvexInputAndOutput(zid("users"), v.id("users"));
+    testZodToBijectionInputAndOutput(zid("users"), v.id("users"));
   });
-  test("string", () => testZodToConvexInputAndOutput(z.string(), v.string()));
+  test("string", () => testZodToBijectionInputAndOutput(z.string(), v.string()));
   test("string formatters", () =>
-    testZodToConvexInputAndOutput(z.email(), v.string()));
-  test("number", () => testZodToConvexInputAndOutput(z.number(), v.number()));
-  test("float64", () => testZodToConvexInputAndOutput(z.float64(), v.number()));
-  test("nan", () => testZodToConvexInputAndOutput(z.nan(), v.number()));
-  test("int64", () => testZodToConvexInputAndOutput(z.int64(), v.int64()));
-  test("bigint", () => testZodToConvexInputAndOutput(z.bigint(), v.int64()));
+    testZodToBijectionInputAndOutput(z.email(), v.string()));
+  test("number", () => testZodToBijectionInputAndOutput(z.number(), v.number()));
+  test("float64", () => testZodToBijectionInputAndOutput(z.float64(), v.number()));
+  test("nan", () => testZodToBijectionInputAndOutput(z.nan(), v.number()));
+  test("int64", () => testZodToBijectionInputAndOutput(z.int64(), v.int64()));
+  test("bigint", () => testZodToBijectionInputAndOutput(z.bigint(), v.int64()));
   test("boolean", () =>
-    testZodToConvexInputAndOutput(z.boolean(), v.boolean()));
-  test("null", () => testZodToConvexInputAndOutput(z.null(), v.null()));
-  test("any", () => testZodToConvexInputAndOutput(z.any(), v.any()));
-  test("unknown", () => testZodToConvexInputAndOutput(z.unknown(), v.any()));
+    testZodToBijectionInputAndOutput(z.boolean(), v.boolean()));
+  test("null", () => testZodToBijectionInputAndOutput(z.null(), v.null()));
+  test("any", () => testZodToBijectionInputAndOutput(z.any(), v.any()));
+  test("unknown", () => testZodToBijectionInputAndOutput(z.unknown(), v.any()));
 
   describe("literal", () => {
     test("string", () => {
-      testZodToConvexInputAndOutput(z.literal("hey"), v.literal("hey"));
+      testZodToBijectionInputAndOutput(z.literal("hey"), v.literal("hey"));
     });
     test("number", () => {
-      testZodToConvexInputAndOutput(z.literal(42), v.literal(42));
+      testZodToBijectionInputAndOutput(z.literal(42), v.literal(42));
     });
     test("int64", () => {
-      testZodToConvexInputAndOutput(z.literal(42n), v.literal(42n));
+      testZodToBijectionInputAndOutput(z.literal(42n), v.literal(42n));
     });
     test("boolean", () => {
-      testZodToConvexInputAndOutput(z.literal(true), v.literal(true));
+      testZodToBijectionInputAndOutput(z.literal(true), v.literal(true));
     });
     test("null", () => {
-      testZodToConvexInputAndOutput(z.literal(null), v.null()); // !
+      testZodToBijectionInputAndOutput(z.literal(null), v.null()); // !
     });
 
     test("multiple values, same type", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.literal([1, 2, 3]),
         ignoreUnionOrder(v.union(v.literal(1), v.literal(2), v.literal(3))),
       );
     });
     test("multiple values, different tyeps", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.literal([123, "xyz", null]),
         ignoreUnionOrder(v.union(v.literal(123), v.literal("xyz"), v.null())),
       );
     });
     test("union of literals", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.union([z.literal([1, 2]), z.literal([3, 4])]),
         v.union(
           ignoreUnionOrder(v.union(v.literal(1), v.literal(2))),
@@ -96,19 +96,19 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
   describe("optional", () => {
     test("z.optional()", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.optional(z.string()),
         v.optional(v.string()),
       );
     });
     test("z.XYZ.optional()", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.string().optional(),
         v.optional(v.string()),
       );
     });
     test("optional doesn’t propagate to array elements", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.array(z.number()).optional(),
         v.optional(v.array(v.number())), // and not v.optional(v.array(v.optional(v.number())))
       );
@@ -116,21 +116,21 @@ describe("zodToConvex + zodOutputToConvex", () => {
   });
 
   test("array", () => {
-    testZodToConvexInputAndOutput(z.array(z.string()), v.array(v.string()));
+    testZodToBijectionInputAndOutput(z.array(z.string()), v.array(v.string()));
   });
 
   describe("union", () => {
     test("never", () => {
-      testZodToConvexInputAndOutput(z.never(), v.union());
+      testZodToBijectionInputAndOutput(z.never(), v.union());
     });
     test("one element (number)", () => {
-      testZodToConvexInputAndOutput(z.union([z.number()]), v.union(v.number()));
+      testZodToBijectionInputAndOutput(z.union([z.number()]), v.union(v.number()));
     });
     test("one element (string)", () => {
-      testZodToConvexInputAndOutput(z.union([z.string()]), v.union(v.string()));
+      testZodToBijectionInputAndOutput(z.union([z.string()]), v.union(v.string()));
     });
     test("multiple elements", () => [
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.union([z.string(), z.number()]),
         v.union(v.string(), v.number()),
       ),
@@ -139,19 +139,19 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
   describe("brand", () => {
     test("string", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.string().brand("myBrand"),
         v.string() as VString<string & zCore.$brand<"myBrand">>,
       );
     });
     test("number", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.number().brand("myBrand"),
         v.number() as VFloat64<number & zCore.$brand<"myBrand">>,
       );
     });
     test("object", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.object({ name: z.string() }).brand("myBrand"),
         v.object({ name: v.string() }) as VObject<
           {
@@ -168,7 +168,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
   });
 
   test("object", () => {
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.object({
         name: z.string(),
         age: z.number(),
@@ -186,7 +186,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
   });
 
   test("strict object", () => {
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.strictObject({
         name: z.string(),
         age: z.number(),
@@ -202,7 +202,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
   describe(".extend", () => {
     test("extended object", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z
           .object({
             baseField: z.string(),
@@ -218,7 +218,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("extended strict object", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z
           .strictObject({
             baseField: z.string(),
@@ -234,7 +234,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("with optional field", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z
           .object({
             baseRequiredField: z.string(),
@@ -254,7 +254,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("same type", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z
           .object({
             field: z.string().optional(),
@@ -271,21 +271,21 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
   describe("record", () => {
     test("key = string", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.string(), z.number()),
         v.record(v.string(), v.number()),
       );
     });
 
     test("key = string, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.string(), z.number().optional()),
         v.record(v.string(), v.number()),
       );
     });
 
     test("key = any", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.any(), z.number()),
         // v.record(v.any(), …) is not allowed in Convex validators
         v.record(v.string(), v.number()),
@@ -293,7 +293,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = any, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.any(), z.number().optional()),
         // v.record(v.any(), …) is not allowed in Convex validators
         v.record(v.string(), v.number()),
@@ -301,7 +301,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = literal", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.literal("user"), z.number()),
         // Convex records can’t have string literals as keys
         v.object({
@@ -311,7 +311,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = literal, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.literal("user"), z.number().optional()),
         // Convex records can’t have string literals as keys
         v.object({
@@ -321,7 +321,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = literal with multiple values", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.literal(["user", "admin"]), z.number()),
         v.object({
           user: v.number(),
@@ -331,7 +331,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = literal with multiple values, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.literal(["user", "admin"]), z.number().optional()),
         v.object({
           user: v.optional(v.number()),
@@ -341,7 +341,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = union of literals", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.union([z.literal("user"), z.literal("admin")]), z.number()),
         v.object({
           user: v.number(),
@@ -351,7 +351,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = union of literals, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(
           z.union([z.literal("user"), z.literal("admin")]),
           z.number().optional(),
@@ -364,7 +364,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = union of literals with multiple values", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(
           z.union([z.literal(["one", "two"]), z.literal(["three", "four"])]),
           z.number(),
@@ -379,7 +379,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = union of literals with multiple values, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(
           z.union([z.literal(["one", "two"]), z.literal(["three", "four"])]),
           z.number().optional(),
@@ -395,7 +395,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
     test("key = v.id()", () => {
       {
-        testZodToConvexInputAndOutput(
+        testZodToBijectionInputAndOutput(
           z.record(zid("documents"), z.number()),
           v.record(v.id("documents"), v.number()),
         );
@@ -404,7 +404,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
     test("key = v.id(), optional", () => {
       {
-        testZodToConvexInputAndOutput(
+        testZodToBijectionInputAndOutput(
           z.record(zid("documents"), z.number().optional()),
           v.record(v.id("documents"), v.number()),
         );
@@ -412,14 +412,14 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = union of ids", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.union([zid("users"), zid("documents")]), z.number()),
         v.record(v.union(v.id("users"), v.id("documents")), v.number()),
       );
     });
 
     test("key = union of ids, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(
           z.union([zid("users"), zid("documents")]),
           z.number().optional(),
@@ -429,7 +429,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = other", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.union([zid("users"), z.literal("none")]), z.number()),
         v.record(v.string(), v.number()),
       );
@@ -438,7 +438,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
   describe("partial record", () => {
     test("key = any", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(z.any(), z.number()),
         // v.record(v.any(), …) is not allowed in Convex validators
         v.record(v.string(), v.number()),
@@ -446,7 +446,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = any, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(z.any(), z.number().optional()),
         // v.record(v.any(), …) is not allowed in Convex validators
         v.record(v.string(), v.number()),
@@ -454,21 +454,21 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = string", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(z.string(), z.number()),
         v.record(v.string(), v.number()),
       );
     });
 
     test("key = string, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(z.string(), z.number().optional()),
         v.record(v.string(), v.number()),
       );
     });
 
     test("key = literal", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(z.literal("user"), z.number()),
         // Convex records can’t have string literals as keys
         v.object({
@@ -478,7 +478,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = literal, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(z.literal("user"), z.number().optional()),
         // Convex records can’t have string literals as keys
         v.object({
@@ -488,7 +488,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = union of literals", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(
           z.union([z.literal("user"), z.literal("admin")]),
           z.number(),
@@ -501,7 +501,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = union of literals, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(
           z.union([z.literal("user"), z.literal("admin")]),
           z.number().optional(),
@@ -515,7 +515,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
     test("key = v.id()", () => {
       {
-        testZodToConvexInputAndOutput(
+        testZodToBijectionInputAndOutput(
           z.partialRecord(zid("documents"), z.number()),
           v.record(v.id("documents"), v.number()),
         );
@@ -524,7 +524,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
     test("key = v.id(), optional", () => {
       {
-        testZodToConvexInputAndOutput(
+        testZodToBijectionInputAndOutput(
           z.partialRecord(zid("documents"), z.number().optional()),
           v.record(v.id("documents"), v.number()),
         );
@@ -532,14 +532,14 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = union of ids", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(z.union([zid("users"), zid("documents")]), z.number()),
         v.record(v.union(v.id("users"), v.id("documents")), v.number()),
       );
     });
 
     test("key = union of ids, optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.partialRecord(
           z.union([zid("users"), zid("documents")]),
           z.number().optional(),
@@ -549,7 +549,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("key = other", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.union([zid("users"), z.literal("none")]), z.number()),
         v.record(v.string(), v.number()),
       );
@@ -557,7 +557,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
   });
 
   test("readonly", () => {
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.array(z.string()).readonly(),
       v.array(v.string()),
     );
@@ -565,7 +565,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
   // Discriminated union
   test("discriminated union", () => {
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.discriminatedUnion("status", [
         z.object({ status: z.literal("success"), data: z.string() }),
         z.object({ status: z.literal("failed"), error: z.string() }),
@@ -579,7 +579,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
   describe("enum", () => {
     test("const array", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.enum(["Salmon", "Tuna", "Trout"]),
         ignoreUnionOrder(
           v.union(v.literal("Salmon"), v.literal("Tuna"), v.literal("Trout")),
@@ -588,7 +588,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     });
 
     test("const array with a number", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.enum(["2", "Salmon", "Tuna"]),
         ignoreUnionOrder(
           v.union(v.literal("2"), v.literal("Salmon"), v.literal("Tuna")),
@@ -601,7 +601,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
         Salmon: 0,
         Tuna: 1,
       } as const;
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.enum(Fish),
         ignoreUnionOrder(v.union(v.literal(0), v.literal(1))),
       );
@@ -613,7 +613,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
         Tuna = 1,
       }
 
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.enum(Fish),
         // Interestingly, TypeScript enums make Fish.Salmon be its own type,
         // even if its value is 0 at runtime.
@@ -625,31 +625,31 @@ describe("zodToConvex + zodOutputToConvex", () => {
   // Tuple
   describe("tuple", () => {
     test("one-element tuple", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.tuple([z.string()]),
         v.array(v.union(v.string())), // suboptimal, we could remove the union
       );
     });
     test("fixed elements, same type", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.tuple([z.string(), z.string()]),
         v.array(v.union(v.string(), v.string())), // suboptimal, we could remove duplicates
       );
     });
     test("fixed elements", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.tuple([z.string(), z.number()]),
         v.array(v.union(v.string(), v.number())),
       );
     });
     test("variadic element, same type", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.tuple([z.string()], z.string()),
         v.array(v.union(v.string(), v.string())), // suboptimal, we could remove duplicates
       );
     });
     test("variadic element", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.tuple([z.string()], z.number()),
         v.array(v.union(v.string(), v.number())),
       );
@@ -658,25 +658,25 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
   describe("nullable", () => {
     test("nullable(string)", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.string().nullable(),
         v.union(v.string(), v.null()),
       );
     });
     test("nullable(number)", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.number().nullable(),
         v.union(v.number(), v.null()),
       );
     });
     test("optional(nullable(string))", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.string().nullable().optional(),
         v.optional(v.union(v.string(), v.null())),
       );
     });
     test("nullable(optional(string)) → swap nullable and optional", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.string().optional().nullable(),
         v.optional(v.union(v.string(), v.null())),
       );
@@ -684,7 +684,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
   });
 
   test("optional", () => {
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.string().optional(),
       v.optional(v.string()),
     );
@@ -692,52 +692,52 @@ describe("zodToConvex + zodOutputToConvex", () => {
 
   describe("non-optional", () => {
     test("id", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         zid("documents").optional().nonoptional(),
         v.id("documents"),
       );
     });
     test("string", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.string().optional().nonoptional(),
         v.string(),
       );
     });
     test("float64", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.float64().optional().nonoptional(),
         v.float64(),
       );
     });
     test("int64", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.int64().optional().nonoptional(),
         v.int64(),
       );
     });
     test("boolean", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.boolean().optional().nonoptional(),
         v.boolean(),
       );
     });
     test("null", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.null().optional().nonoptional(),
         v.null(),
       );
     });
     test("any", () => {
-      testZodToConvexInputAndOutput(z.any().optional().nonoptional(), v.any());
+      testZodToBijectionInputAndOutput(z.any().optional().nonoptional(), v.any());
     });
     test("literal", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.literal(42n).optional().nonoptional(),
         v.literal(42n),
       );
     });
     test("object", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z
           .object({
             required: z.string(),
@@ -749,38 +749,38 @@ describe("zodToConvex + zodOutputToConvex", () => {
       );
     });
     test("array", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.array(z.int64()).optional().nonoptional(),
         v.array(v.int64()),
       );
     });
     test("record", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.record(z.string(), z.number()).optional().nonoptional(),
         v.record(v.string(), v.number()),
       );
     });
     test("union", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.union([z.number(), z.string()]).optional().nonoptional(),
         v.union(v.number(), v.string()),
       );
     });
 
     test("nonoptional on non-optional type", () => {
-      testZodToConvexInputAndOutput(z.string().nonoptional(), v.string());
+      testZodToBijectionInputAndOutput(z.string().nonoptional(), v.string());
     });
   });
 
   test("lazy", () => {
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.lazy(() => z.string()),
       v.string(),
     );
   });
 
   test("custom", () => {
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.custom<string & { __myBrand: true }>(() => true),
       v.any(),
     );
@@ -795,7 +795,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
         },
       });
 
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         category,
         // @ts-expect-error -- the TypeScript type is recursive, while the
         // runtime time uses `v.any()` since Convex validators can’t be recursive
@@ -814,7 +814,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
         },
       });
 
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         linkedList,
         // @ts-expect-error -- the TypeScript type is recursive, while the
         // runtime time uses `v.any()` since Convex validators can’t be recursive
@@ -830,7 +830,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
         name: z.string(),
       });
 
-      testZodOutputToConvex(
+      testZodOutputToBijection(
         z.object({
           field1: commonField,
           field2: commonField,
@@ -853,7 +853,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
         optionalField: z.boolean().optional(),
       });
 
-      testZodOutputToConvex(
+      testZodOutputToBijection(
         z.union([
           baseSchema.extend({
             kind: z.literal("A"),
@@ -881,36 +881,36 @@ describe("zodToConvex + zodOutputToConvex", () => {
   });
 
   test("catch", () => {
-    testZodToConvexInputAndOutput(z.string().catch("hello"), v.string());
+    testZodToBijectionInputAndOutput(z.string().catch("hello"), v.string());
   });
 
   describe("template literals", () => {
     test("constant string", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.templateLiteral(["hi there"]),
         v.string() as VString<"hi there", "required">,
       );
     });
     test("string interpolation", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.templateLiteral(["email: ", z.string()]),
         v.string() as VString<`email: ${string}`, "required">,
       );
     });
     test("literal interpolation", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.templateLiteral(["high", z.literal(5)]),
         v.string() as VString<"high5", "required">,
       );
     });
     test("nullable interpolation", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.templateLiteral([z.nullable(z.literal("grassy"))]),
         v.string() as VString<"grassy" | "null", "required">,
       );
     });
     test("enum interpolation", () => {
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.templateLiteral([z.number(), z.enum(["px", "em", "rem"])]),
         v.string() as VString<`${number}${"px" | "em" | "rem"}`, "required">,
       );
@@ -921,7 +921,7 @@ describe("zodToConvex + zodOutputToConvex", () => {
     // We could do some more advanced logic here where we compute
     // the Convex validator that results from the intersection.
     // For now, we simply use v.any()
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.intersection(
         z.object({ key1: z.string() }),
         z.object({ key2: z.string() }),
@@ -967,17 +967,17 @@ describe("zodToConvex + zodOutputToConvex", () => {
   });
 });
 
-describe("zodToConvex", () => {
+describe("zodToBijection", () => {
   describe("transform", () => {
     test("sync transform", () => {
-      testZodToConvex(
+      testZodToBijection(
         z.number().transform((s) => s.toString()),
         v.number(), // input type
       );
     });
 
     test("async transform", () => {
-      testZodToConvex(
+      testZodToBijection(
         z.number().transform(async (s) => s.toString()),
         v.number(), // input type
       );
@@ -985,14 +985,14 @@ describe("zodToConvex", () => {
   });
 
   test("pipe", () => {
-    testZodToConvex(
+    testZodToBijection(
       z.number().pipe(z.transform((s) => s.toString())),
       v.number(), // input type
     );
   });
 
   test("codec", () => {
-    testZodToConvex(
+    testZodToBijection(
       z.codec(z.string(), z.number(), {
         decode: (s: string) => parseInt(s, 10),
         encode: (n: number) => n.toString(),
@@ -1002,42 +1002,42 @@ describe("zodToConvex", () => {
   });
 
   test("default", () => {
-    testZodToConvex(z.string().default("hello"), v.optional(v.string()));
+    testZodToBijection(z.string().default("hello"), v.optional(v.string()));
   });
 
   describe("problematic inputs", () => {
     test("unknown", () => {
       const someType: unknown = z.string();
-      const _asConvex = zodToConvex(
+      const _asBijection = zodToBijection(
         // @ts-expect-error Can’t use unknown
         someType,
       );
-      assert<Equals<typeof _asConvex, GenericValidator>>();
+      assert<Equals<typeof _asBijection, GenericValidator>>();
     });
 
     test("ZodType<unknown>", () => {
       const someType: zCore.$ZodType<unknown> = z.string();
-      const _asConvex = zodToConvex(someType);
-      assert<Equals<typeof _asConvex, GenericValidator>>();
+      const _asBijection = zodToBijection(someType);
+      assert<Equals<typeof _asBijection, GenericValidator>>();
     });
 
     test("ZodType<some>", () => {
       const someType: zCore.$ZodType<string> = z.string();
-      const _asConvex = zodToConvex(someType);
-      assert<Equals<typeof _asConvex, GenericValidator>>();
+      const _asBijection = zodToBijection(someType);
+      assert<Equals<typeof _asBijection, GenericValidator>>();
     });
 
     test("any type", () => {
       const someType: any = z.string();
-      const _asConvex = zodToConvex(someType);
-      assert<Equals<typeof _asConvex, GenericValidator>>();
+      const _asBijection = zodToBijection(someType);
+      assert<Equals<typeof _asBijection, GenericValidator>>();
     });
   });
 
   describe("lazy", () => {
     test("throwing", () => {
       expect(() =>
-        zodToConvex(
+        zodToBijection(
           z.lazy((): zCore.$ZodString => {
             throw new Error("This shouldn’t throw but it did");
           }),
@@ -1047,17 +1047,17 @@ describe("zodToConvex", () => {
   });
 });
 
-describe("zodOutputToConvex", () => {
+describe("zodOutputToBijection", () => {
   describe("transform", () => {
     test("sync transform", () => {
-      testZodOutputToConvex(
+      testZodOutputToBijection(
         z.number().transform((s) => s.toString()),
         v.any(), // this transform doesn’t hold runtime info about the output type
       );
     });
 
     test("async transform", () => {
-      testZodOutputToConvex(
+      testZodOutputToBijection(
         z.number().transform(async (s) => s.toString()),
         v.any(), // this transform doesn’t hold runtime info about the output type
       );
@@ -1065,7 +1065,7 @@ describe("zodOutputToConvex", () => {
   });
 
   test("pipe", () => {
-    testZodOutputToConvex(
+    testZodOutputToBijection(
       z.number().pipe(z.transform((s) => s.toString())),
       v.any(), // this transform doesn’t hold runtime info about the output type
     );
@@ -1073,7 +1073,7 @@ describe("zodOutputToConvex", () => {
 
   describe("codec", () => {
     test("simple case", () => {
-      testZodOutputToConvex(
+      testZodOutputToBijection(
         z.codec(z.string(), z.number(), {
           decode: (s: string) => parseInt(s, 10),
           encode: (n: number) => n.toString(),
@@ -1090,25 +1090,25 @@ describe("zodOutputToConvex", () => {
       });
 
       test("optional codec returns VOptional<VFloat64>", () => {
-        testZodOutputToConvex(dateToMsCodec.optional(), v.optional(v.number()));
+        testZodOutputToBijection(dateToMsCodec.optional(), v.optional(v.number()));
       });
 
       test("nullable codec returns VUnion with null", () => {
-        testZodOutputToConvex(
+        testZodOutputToBijection(
           dateToMsCodec.nullable(),
           v.union(v.number(), v.null()),
         );
       });
 
       test("optional nullable codec", () => {
-        testZodOutputToConvex(
+        testZodOutputToBijection(
           dateToMsCodec.nullable().optional(),
           v.optional(v.union(v.number(), v.null())),
         );
       });
 
       test("nullable optional codec (swapped order)", () => {
-        testZodOutputToConvex(
+        testZodOutputToBijection(
           dateToMsCodec.optional().nullable(),
           v.optional(v.union(v.number(), v.null())),
         );
@@ -1121,14 +1121,14 @@ describe("zodOutputToConvex", () => {
       });
 
       test("optional string-to-number codec", () => {
-        testZodOutputToConvex(
+        testZodOutputToBijection(
           stringToNumberCodec.optional(),
           v.optional(v.number()),
         );
       });
 
       test("codec with default", () => {
-        testZodOutputToConvex(
+        testZodOutputToBijection(
           dateToMsCodec.default(Date.now()),
           v.number(), // default means output is always present
         );
@@ -1137,14 +1137,14 @@ describe("zodOutputToConvex", () => {
   });
 
   test("default", () => {
-    testZodOutputToConvex(z.string().default("hello"), v.string());
+    testZodOutputToBijection(z.string().default("hello"), v.string());
   });
 });
 
 describe("codec or pipe nested in another schema", () => {
   // A nested schema is converted from the same side as the schema containing
-  // it: the codec’s input (a string) in zodToConvex, and its output (a number)
-  // in zodOutputToConvex.
+  // it: the codec’s input (a string) in zodToBijection, and its output (a number)
+  // in zodOutputToBijection.
   const stringToNumberCodec = z.codec(z.string(), z.number(), {
     decode: (s: string) => parseFloat(s),
     encode: (n: number) => n.toString(),
@@ -1152,46 +1152,46 @@ describe("codec or pipe nested in another schema", () => {
 
   test("object field", () => {
     const schema = z.object({ n: stringToNumberCodec });
-    testZodOutputToConvex(schema, v.object({ n: v.number() }));
+    testZodOutputToBijection(schema, v.object({ n: v.number() }));
 
-    // The object type of zodToConvex comes from z.infer, so only the field is compared
-    const inputValidator = zodToConvex(schema);
+    // The object type of zodToBijection comes from z.infer, so only the field is compared
+    const inputValidator = zodToBijection(schema);
     expectTypeOf(inputValidator.fields.n).toEqualTypeOf<VString>();
     expect(inputValidator).toEqual(v.object({ n: v.string() }));
   });
 
   test("optional object field", () => {
-    testZodOutputToConvex(
+    testZodOutputToBijection(
       z.object({ n: stringToNumberCodec.optional() }),
       v.object({ n: v.optional(v.number()) }),
     );
   });
 
   test("object field with a default", () => {
-    testZodOutputToConvex(
+    testZodOutputToBijection(
       z.object({ n: stringToNumberCodec.default(0) }),
       v.object({ n: v.number() }), // default means output is always present
     );
   });
 
   test("array element", () => {
-    testZodToConvex(z.array(stringToNumberCodec), v.array(v.string()));
-    testZodOutputToConvex(z.array(stringToNumberCodec), v.array(v.number()));
+    testZodToBijection(z.array(stringToNumberCodec), v.array(v.string()));
+    testZodOutputToBijection(z.array(stringToNumberCodec), v.array(v.number()));
   });
 
   test("nullable array element", () => {
-    testZodToConvex(
+    testZodToBijection(
       z.array(stringToNumberCodec.nullable()),
       v.array(v.union(v.string(), v.null())),
     );
-    testZodOutputToConvex(
+    testZodOutputToBijection(
       z.array(stringToNumberCodec.nullable()),
       v.array(v.union(v.number(), v.null())),
     );
   });
 
   test("object in an array", () => {
-    testZodOutputToConvex(
+    testZodOutputToBijection(
       z.array(z.object({ n: stringToNumberCodec })),
       v.array(v.object({ n: v.number() })),
     );
@@ -1204,27 +1204,27 @@ describe("codec or pipe nested in another schema", () => {
         z.object({ n: z.number() }),
       ),
     );
-    testZodToConvex(schema, v.array(v.any())); // the input is a transform
-    testZodOutputToConvex(schema, v.array(v.object({ n: v.number() })));
+    testZodToBijection(schema, v.array(v.any())); // the input is a transform
+    testZodOutputToBijection(schema, v.array(v.object({ n: v.number() })));
   });
 
   test("union member", () => {
-    testZodToConvex(
+    testZodToBijection(
       z.union([stringToNumberCodec, z.null()]),
       v.union(v.string(), v.null()),
     );
-    testZodOutputToConvex(
+    testZodOutputToBijection(
       z.union([stringToNumberCodec, z.null()]),
       v.union(v.number(), v.null()),
     );
   });
 
   test("tuple item", () => {
-    testZodToConvex(
+    testZodToBijection(
       z.tuple([stringToNumberCodec]),
       v.array(v.union(v.string())),
     );
-    testZodOutputToConvex(
+    testZodOutputToBijection(
       z.tuple([stringToNumberCodec]),
       v.array(v.union(v.number())),
     );
@@ -1232,57 +1232,57 @@ describe("codec or pipe nested in another schema", () => {
 
   test("record value", () => {
     const schema = z.record(z.string(), stringToNumberCodec);
-    testZodOutputToConvex(schema, v.record(v.string(), v.number()));
+    testZodOutputToBijection(schema, v.record(v.string(), v.number()));
 
-    // The record type of zodToConvex comes from z.infer, so only the value is compared
-    const inputValidator = zodToConvex(schema);
+    // The record type of zodToBijection comes from z.infer, so only the value is compared
+    const inputValidator = zodToBijection(schema);
     expectTypeOf(inputValidator.value).toEqualTypeOf<VString>();
     expect(inputValidator).toEqual(v.record(v.string(), v.string()));
   });
 
   test("record value, key = literal", () => {
-    testZodToConvex(
+    testZodToBijection(
       z.record(z.literal(["a", "b"]), stringToNumberCodec),
       v.object({ a: v.string(), b: v.string() }),
     );
-    testZodOutputToConvex(
+    testZodOutputToBijection(
       z.record(z.literal(["a", "b"]), stringToNumberCodec),
       v.object({ a: v.number(), b: v.number() }),
     );
   });
 
   test("readonly", () => {
-    testZodToConvex(stringToNumberCodec.readonly(), v.string());
-    testZodOutputToConvex(stringToNumberCodec.readonly(), v.number());
+    testZodToBijection(stringToNumberCodec.readonly(), v.string());
+    testZodOutputToBijection(stringToNumberCodec.readonly(), v.number());
   });
 
   test("lazy", () => {
-    testZodToConvex(
+    testZodToBijection(
       z.lazy(() => stringToNumberCodec),
       v.string(),
     );
-    testZodOutputToConvex(
+    testZodOutputToBijection(
       z.lazy(() => stringToNumberCodec),
       v.number(),
     );
   });
 
   test("catch", () => {
-    testZodToConvex(stringToNumberCodec.catch(0), v.string());
-    testZodOutputToConvex(stringToNumberCodec.catch(0), v.number());
+    testZodToBijection(stringToNumberCodec.catch(0), v.string());
+    testZodOutputToBijection(stringToNumberCodec.catch(0), v.number());
   });
 
   test("non-optional", () => {
-    testZodToConvex(stringToNumberCodec.optional().nonoptional(), v.string());
-    testZodOutputToConvex(
+    testZodToBijection(stringToNumberCodec.optional().nonoptional(), v.string());
+    testZodOutputToBijection(
       stringToNumberCodec.optional().nonoptional(),
       v.number(),
     );
   });
 });
 
-test("zodToConvexFields", () => {
-  const convexFields = zodToConvexFields({
+test("zodToBijectionFields", () => {
+  const convexFields = zodToBijectionFields({
     name: z.string(),
     optional: z.number().optional(),
     nullable: z.string().nullable(),
@@ -1309,8 +1309,8 @@ test("zodToConvexFields", () => {
   });
 });
 
-test("zodOutputToConvexFields", () => {
-  const convexFields = zodOutputToConvexFields({
+test("zodOutputToBijectionFields", () => {
+  const convexFields = zodOutputToBijectionFields({
     name: z.string(),
     optional: z.number().optional(),
     nullable: z.string().nullable(),
@@ -1363,7 +1363,7 @@ test("withSystemFields", () => {
 
   for (const [key, value] of Object.entries(sysFieldsShape)) {
     if (key === "_id") {
-      expect(zodToConvex(value)).to.deep.equal(v.id("users"));
+      expect(zodToBijection(value)).to.deep.equal(v.id("users"));
       continue;
     }
 
@@ -1378,34 +1378,34 @@ describe("testing infrastructure", () => {
     // eslint-disable-next-line no-constant-condition
     if (false) {
       // typecheck only
-      testZodToConvex(
+      testZodToBijection(
         z.string(),
         // @ts-expect-error -- This error should be caught by TypeScript
         v.optional(v.string()),
       );
-      testZodToConvex(
+      testZodToBijection(
         z.string().optional(),
         // @ts-expect-error -- This error should be caught by TypeScript
         v.string(),
       );
 
-      testZodOutputToConvex(
+      testZodOutputToBijection(
         z.string(),
         // @ts-expect-error -- This error should be caught by TypeScript
         v.optional(v.string()),
       );
-      testZodOutputToConvex(
+      testZodOutputToBijection(
         z.string().optional(),
         // @ts-expect-error -- This error should be caught by TypeScript
         v.string(),
       );
 
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.string(),
         // @ts-expect-error -- This error should be caught by TypeScript
         v.optional(v.string()),
       );
-      testZodToConvexInputAndOutput(
+      testZodToBijectionInputAndOutput(
         z.string().optional(),
         // @ts-expect-error -- This error should be caught by TypeScript
         v.string(),
@@ -1414,17 +1414,17 @@ describe("testing infrastructure", () => {
   });
 
   test("test methods typecheck if the IsOptional value of the result is set correctly", () => {
-    testZodToConvex(z.string().optional(), v.optional(v.string()));
-    testZodToConvex(z.string(), v.string());
+    testZodToBijection(z.string().optional(), v.optional(v.string()));
+    testZodToBijection(z.string(), v.string());
 
-    testZodOutputToConvex(z.string().optional(), v.optional(v.string()));
-    testZodOutputToConvex(z.string(), v.string());
+    testZodOutputToBijection(z.string().optional(), v.optional(v.string()));
+    testZodOutputToBijection(z.string(), v.string());
 
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.string().optional(),
       v.optional(v.string()),
     );
-    testZodToConvexInputAndOutput(z.string(), v.string());
+    testZodToBijectionInputAndOutput(z.string(), v.string());
   });
 
   test("ignoreUnionOrder", () => {
@@ -1476,16 +1476,16 @@ describe("zid with derived schemas", () => {
     // still be recognized as a zid via the registry's parent chain lookup.
     const described = zid("users").describe("The user's ID");
 
-    expect(zodToConvex(described)).toEqual(v.id("users"));
-    expect(zodOutputToConvex(described)).toEqual(v.id("users"));
+    expect(zodToBijection(described)).toEqual(v.id("users"));
+    expect(zodOutputToBijection(described)).toEqual(v.id("users"));
   });
 
   test("z.string().describe() is not misidentified as a zid", () => {
     // Regression guard: deriving a non-zid schema should never produce v.id().
     const described = z.string().describe("A plain string");
 
-    expect(zodToConvex(described)).toEqual(v.string());
-    expect(zodOutputToConvex(described)).toEqual(v.string());
+    expect(zodToBijection(described)).toEqual(v.string());
+    expect(zodOutputToBijection(described)).toEqual(v.string());
   });
 });
 
@@ -1516,14 +1516,14 @@ describe("zid registry parent-chain inheritance bug", () => {
     stringSchema._zod.parent = userIdSchema;
 
     try {
-      // With the old code (registry check at top of zodToConvexCommon):
+      // With the old code (registry check at top of zodToBijectionCommon):
       //   _zidRegistry.get(stringSchema) returns { tableName: "users" }
       //   → calls v.id("users") → WRONG: this is a string, not an ID!
       //
       // With the fix (registry check inside $ZodCustom branch):
       //   instanceof $ZodString fires first → returns v.string() ✓
-      expect(zodToConvex(stringSchema)).toEqual(v.string());
-      expect(zodOutputToConvex(stringSchema)).toEqual(v.string());
+      expect(zodToBijection(stringSchema)).toEqual(v.string());
+      expect(zodOutputToBijection(stringSchema)).toEqual(v.string());
     } finally {
       stringSchema._zod.parent = originalParent;
     }
@@ -1540,8 +1540,8 @@ describe("zid registry parent-chain inheritance bug", () => {
       // With old code: _zidRegistry.get(numberSchema) → { tableName: "users" }
       //   → v.id("users") → WRONG
       // With fix: instanceof $ZodNumber fires first → v.number() ✓
-      expect(zodToConvex(numberSchema)).toEqual(v.number());
-      expect(zodOutputToConvex(numberSchema)).toEqual(v.number());
+      expect(zodToBijection(numberSchema)).toEqual(v.number());
+      expect(zodOutputToBijection(numberSchema)).toEqual(v.number());
     } finally {
       numberSchema._zod.parent = originalParent;
     }
@@ -1555,8 +1555,8 @@ describe("zid registry parent-chain inheritance bug", () => {
     boolSchema._zod.parent = userIdSchema;
 
     try {
-      expect(zodToConvex(boolSchema)).toEqual(v.boolean());
-      expect(zodOutputToConvex(boolSchema)).toEqual(v.boolean());
+      expect(zodToBijection(boolSchema)).toEqual(v.boolean());
+      expect(zodOutputToBijection(boolSchema)).toEqual(v.boolean());
     } finally {
       boolSchema._zod.parent = originalParent;
     }
@@ -1572,7 +1572,7 @@ describe("zid registry parent-chain inheritance bug", () => {
 
     try {
       const objectSchema = z.object({ name: nameField, age: z.number() });
-      const result = zodToConvex(objectSchema);
+      const result = zodToBijection(objectSchema);
 
       // The "name" field should be v.string(), NOT v.id("users")
       expect(result).toEqual(v.object({ name: v.string(), age: v.number() }));
@@ -1600,7 +1600,7 @@ describe("zid registry parent-chain inheritance bug", () => {
     try {
       // With the fix: instanceof $ZodString fires first → v.string()
       // The registry is never even consulted for non-$ZodCustom schemas.
-      expect(zodToConvex(stringSchema)).toEqual(v.string());
+      expect(zodToBijection(stringSchema)).toEqual(v.string());
     } finally {
       stringSchema._zod.parent = originalParent;
     }
@@ -1608,18 +1608,18 @@ describe("zid registry parent-chain inheritance bug", () => {
 });
 
 // Regression suite for `exactOptionalPropertyTypes: true` consumers:
-// `ConvexValidatorFromZod` must produce `VObject<ObjectType<F>, F, ...>`
+// `BijectionValidatorFromZod` must produce `VObject<ObjectType<F>, F, ...>`
 // at every nesting depth — same shape `v.object(...)` produces. The earlier
 // implementation passed `zCore.infer<Z>` into the Type slot, which leaks
 // `| undefined` into value position for optional fields and breaks downstream
 // code compiled with `exactOptionalPropertyTypes`. The strict `Equals<>` constraint inside
-// `testZodToConvexInputAndOutput` is the actual lock: without the fix the
+// `testZodToBijectionInputAndOutput` is the actual lock: without the fix the
 // expected `v.object(...)` literal (which derives via `ObjectType<F>`) no
 // longer structurally equals the bridge's output and the call fails to
 // type-check under the root `tsc --noEmit` that CI runs.
 describe("nested optional object Type derives via ObjectType<F>", () => {
   test("one-level: optional object field with mixed required + record inside", () => {
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.object({
         label: z.string(),
         metricsBlock: z
@@ -1654,7 +1654,7 @@ describe("nested optional object Type derives via ObjectType<F>", () => {
         .optional(),
     });
 
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.object({
         stage_a: stageStateSchema.optional(),
         stage_b: stageStateSchema.optional(),
@@ -1694,7 +1694,7 @@ describe("nested optional object Type derives via ObjectType<F>", () => {
     // reorders Site 1 so branded objects fall through, this test will fail
     // (the cast target uses the stripped `{ tag?: string }` shape, not the
     // pre-fix `{ tag?: string | undefined }` shape).
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.object({ id: z.string(), tag: z.string().optional() }).brand("widget"),
       v.object({ id: v.string(), tag: v.optional(v.string()) }) as VObject<
         { id: string; tag?: string } & zCore.$brand<"widget">,
@@ -1708,12 +1708,12 @@ describe("nested optional object Type derives via ObjectType<F>", () => {
     );
   });
 
-  test("Site 3: literal-keyed record routes through ConvexObjectValidatorFromRecord", () => {
-    // Literal-key records route through `ConvexObjectValidatorFromRecord`
+  test("Site 3: literal-keyed record routes through BijectionObjectValidatorFromRecord", () => {
+    // Literal-key records route through `BijectionObjectValidatorFromRecord`
     // (the other site that needed `ObjectType<F>`), not the `VRecord` path
     // used by string-keyed records — without the fix the inner
     // `note?: string | undefined` leaks.
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.record(
         z.literal(["a", "b"]),
         z.object({
@@ -1732,7 +1732,7 @@ describe("nested optional object Type derives via ObjectType<F>", () => {
     // Non-recursive deep schema — recovers compile-time Equals<>-lock coverage
     // that the self-referential `category` / linked-list tests had to drop
     // (they cast through `as zCore.$ZodType` to dodge eager type expansion).
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z.object({
         l1: z
           .object({
@@ -1769,7 +1769,7 @@ describe("nested optional object Type derives via ObjectType<F>", () => {
   });
 
   test("partial(): every field optional, no `| undefined` in value position", () => {
-    testZodToConvexInputAndOutput(
+    testZodToBijectionInputAndOutput(
       z
         .object({
           alpha: z.string(),
@@ -1807,7 +1807,7 @@ describe("zid typing", () => {
 });
 
 // Regression suite for convex-helpers issue: after 0.1.119, using `zid` inside
-// a Zod object passed to `defineTable(zodOutputToConvex(...))` inflated the id
+// a Zod object passed to `defineTable(zodOutputToBijection(...))` inflated the id
 // field's TypeScript type. The Type slot of the generated `VObject` derived via
 // `EOPTInfer<zCore.infer<Z>>`, and `EOPTInfer` recursed into `GenericId<T>`
 // (which is `string & { __tableName: T }`) as if it were a plain object. That
@@ -1826,11 +1826,11 @@ describe("zid inside defineTable keeps GenericId in the Doc type (issue: type in
     });
 
     const _schema = defineSchema({
-      projects: defineTable(zodOutputToConvex(projectSchema)).index(
+      projects: defineTable(zodOutputToBijection(projectSchema)).index(
         "by_userId",
         ["userId"],
       ),
-      users: defineTable(zodOutputToConvex(usersSchema)),
+      users: defineTable(zodOutputToBijection(usersSchema)),
     });
 
     type DataModel = DataModelFromSchemaDefinition<typeof _schema>;
@@ -1844,50 +1844,50 @@ describe("zid inside defineTable keeps GenericId in the Doc type (issue: type in
   });
 
   test("the VObject Type slot itself keeps GenericId for zid fields", () => {
-    const _validator = zodOutputToConvex(z.object({ userId: zid("users") }));
+    const _validator = zodOutputToBijection(z.object({ userId: zid("users") }));
     expectTypeOf<(typeof _validator)["type"]>().toEqualTypeOf<{
       userId: GenericId<"users">;
     }>();
 
     // Same expectation for the input-side bridge.
-    const _inputValidator = zodToConvex(z.object({ userId: zid("users") }));
+    const _inputValidator = zodToBijection(z.object({ userId: zid("users") }));
     expectTypeOf<(typeof _inputValidator)["type"]>().toEqualTypeOf<{
       userId: GenericId<"users">;
     }>();
   });
 });
 
-export function testZodToConvex<
+export function testZodToBijection<
   Z extends zCore.$ZodType,
   Expected extends GenericValidator,
 >(
   validator: Z,
   expected: Expected &
     (ExtractOptional<Expected> extends infer IsOpt extends OptionalProperty
-      ? Equals<Expected, ConvexValidatorFromZod<Z, IsOpt>> extends true
+      ? Equals<Expected, BijectionValidatorFromZod<Z, IsOpt>> extends true
         ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
           {}
-        : "Expected type must exactly match ConvexValidatorFromZod<Z, IsOptional>"
+        : "Expected type must exactly match BijectionValidatorFromZod<Z, IsOptional>"
       : "Could not extract IsOptional from Expected"),
 ) {
-  const actual = zodToConvex(validator);
+  const actual = zodToBijection(validator);
   expect(actual).to.deep.equal(expected);
 }
 
-export function testZodOutputToConvex<
+export function testZodOutputToBijection<
   Z extends zCore.$ZodType,
   Expected extends GenericValidator,
 >(
   validator: Z,
   expected: Expected &
     (ExtractOptional<Expected> extends infer IsOpt extends OptionalProperty
-      ? Equals<Expected, ConvexValidatorFromZodOutput<Z, IsOpt>> extends true
+      ? Equals<Expected, BijectionValidatorFromZodOutput<Z, IsOpt>> extends true
         ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
           {}
-        : "Expected type must exactly match ConvexValidatorFromZodOutput<Z, IsOptional>"
+        : "Expected type must exactly match BijectionValidatorFromZodOutput<Z, IsOptional>"
       : "Could not extract IsOptional from Expected"),
 ) {
-  const actual = zodOutputToConvex(validator);
+  const actual = zodOutputToBijection(validator);
   expect(actual).to.deep.equal(expected);
 }
 
@@ -1895,30 +1895,30 @@ export function testZodOutputToConvex<
 type ExtractOptional<V> =
   V extends Validator<any, infer IsOptional, any> ? IsOptional : never;
 
-export function testZodToConvexInputAndOutput<
+export function testZodToBijectionInputAndOutput<
   Z extends zCore.$ZodType,
   Expected extends GenericValidator,
 >(
   validator: Z,
   expected: Expected &
     (ExtractOptional<Expected> extends infer IsOpt extends OptionalProperty
-      ? Equals<Expected, ConvexValidatorFromZod<Z, IsOpt>> extends true
-        ? Equals<Expected, ConvexValidatorFromZodOutput<Z, IsOpt>> extends true
+      ? Equals<Expected, BijectionValidatorFromZod<Z, IsOpt>> extends true
+        ? Equals<Expected, BijectionValidatorFromZodOutput<Z, IsOpt>> extends true
           ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
             {}
-          : "Expected type must exactly match ConvexValidatorFromZodOutput<Z, IsOptional>"
-        : "Expected type must exactly match ConvexValidatorFromZod<Z, IsOptional>"
+          : "Expected type must exactly match BijectionValidatorFromZodOutput<Z, IsOptional>"
+        : "Expected type must exactly match BijectionValidatorFromZod<Z, IsOptional>"
       : "Could not extract IsOptional from Expected"),
 ) {
-  testZodToConvex(validator, expected as any);
-  testZodOutputToConvex(validator, expected as any);
+  testZodToBijection(validator, expected as any);
+  testZodOutputToBijection(validator, expected as any);
 }
 
 type MustBeUnrepresentable<Z extends zCore.$ZodType> = [
-  ConvexValidatorFromZod<Z, OptionalProperty>,
+  BijectionValidatorFromZod<Z, OptionalProperty>,
 ] extends [never]
   ? never
-  : [ConvexValidatorFromZodOutput<Z, OptionalProperty>] extends [never]
+  : [BijectionValidatorFromZodOutput<Z, OptionalProperty>] extends [never]
     ? never
     : Z;
 
@@ -1926,10 +1926,10 @@ export function assertUnrepresentableType<
   Z extends MustBeUnrepresentable<zCore.$ZodType>,
 >(validator: Z) {
   expect(() => {
-    zodToConvex(validator);
+    zodToBijection(validator);
   }).toThrowError();
   expect(() => {
-    zodOutputToConvex(validator);
+    zodOutputToBijection(validator);
   }).toThrowError(/(is not supported in Convex|is not a valid Convex value)/);
 }
 
@@ -1952,7 +1952,7 @@ export function assertUnrepresentableType<
  * Some Zod schemas (e.g. `v.enum(…)` and `v.literal([…])`) store their inner
  * types as a union and not as a tuple type.
  * Since TypeScript has no guarantees about the order of union members,
- * the type returned by `zodToConvex` must be imprecise, for instance:
+ * the type returned by `zodToBijection` must be imprecise, for instance:
  *
  * ```ts
  * // The inner type 1 | 2 | 3, so any type transformation that we do could
@@ -1968,7 +1968,7 @@ export function assertUnrepresentableType<
  *   )[],
  *   "required",
  *   never
- * > = zodToConvex(zodLiteralValidator);
+ * > = zodToBijection(zodLiteralValidator);
  * ```
  *
  * This function takes a union validator and returns it with a more imprecise
