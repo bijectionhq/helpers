@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"slices"
 	"sort"
+	"strings"
 
 	"concave/internal/continuation"
 	"concave/internal/policy"
@@ -259,13 +260,38 @@ func otherTool(tool string) (string, error) {
 // its policy inputs, so this version never recomputes the baseline's.
 func baselineInspection(repo *repository.Repo, tool, revision string) (*Report, error) {
 	run, err := process.Run(repo.Context, repo.Root, []string{tool, "--repo", repo.Root, "check", "--rev", revision, "--json"}, nil, 512<<20)
-	var exit *exec.ExitError
-	if err != nil && !(errors.As(err, &exit) && run.ExitCode == 1) || err == nil && run.ExitCode != 0 {
-		return nil, fmt.Errorf("baseline Concave check failed (%d): %v\n%s", run.ExitCode, err, tail(run.Stderr))
-	}
 	var report Report
-	if err := json.Unmarshal(run.Stdout, &report); err != nil {
-		return nil, fmt.Errorf("baseline Concave report: %w", err)
+	if decode := json.Unmarshal(run.Stdout, &report); decode != nil {
+		return nil, fmt.Errorf("baseline Concave report: %w", decode)
+	}
+	var exit *exec.ExitError
+	accepted := err == nil && run.ExitCode == 0 || errors.As(err, &exit) && run.ExitCode == 1
+	if !accepted && errors.As(err, &exit) && run.ExitCode == 2 {
+		// Old readers appended '/' to an explicitly declared file root. This
+		// metadata error may be repaired only while the exact file still exists;
+		// every unsupported source or genuinely missing selector still refuses.
+		config, load := policy.Load(repo, revision)
+		tree, read := repo.Tree(revision)
+		if load == nil && read == nil {
+			seen := false
+			accepted = true
+			for _, finding := range report.Findings {
+				if finding.Kind != "unmatched_selector" && finding.Kind != "unsupported_change" {
+					continue
+				}
+				path := strings.TrimSuffix(finding.Path, "/")
+				entry, exists := tree[path]
+				if finding.Kind != "unmatched_selector" || finding.Path == path || !exists ||
+					(entry.Mode != "100644" && entry.Mode != "100755") || !slices.Contains(config.RootSelectors(), path) {
+					accepted = false
+				}
+				seen = true
+			}
+			accepted = accepted && seen
+		}
+	}
+	if !accepted {
+		return nil, fmt.Errorf("baseline Concave check failed (%d): %v\n%s", run.ExitCode, err, tail(run.Stderr))
 	}
 	if report.Format != 1 || report.Kind != "concave-inspection" || report.Revision != revision || report.PolicySHA256 == "" ||
 		(report.Status == "passed") != (run.ExitCode == 0) || report.Findings == nil {
@@ -430,6 +456,15 @@ func coverageLoss(previous, current *policy.Config, before, after *Report) []Cov
 	for _, finding := range difference(before.Findings, after.Findings, policy.Finding.Location) {
 		if _, ok := retired[finding.Exception]; ok && finding.Exception != "" {
 			continue
+		}
+		if finding.Kind == "unmatched_selector" && strings.HasSuffix(finding.Path, "/") {
+			path := strings.TrimSuffix(finding.Path, "/")
+			if row, ok := rows[path]; ok && row.Selected != nil && (row.Selected.Mode == "100644" || row.Selected.Mode == "100755") &&
+				slices.Contains(previous.RootSelectors(), path) && slices.Contains(current.RootSelectors(), path) {
+				// The metadata error is gone; the same baseline file is now read.
+				// lostCoverage above still refuses any genuinely dropped row.
+				continue
+			}
 		}
 		row, ok := rows[finding.Path]
 		if ok && approvedDivergence(finding, row, current) || finding.Rule == "source/covered" && approvedHunks[finding.Location()] {

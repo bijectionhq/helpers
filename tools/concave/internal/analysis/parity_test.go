@@ -266,11 +266,69 @@ func TestParityUsesTheBaselineToolForCoverage(t *testing.T) {
 	if _, err = check(tool(before, 2)); err == nil {
 		t.Fatal("failed baseline check accepted")
 	}
+	missing := *before
+	missing.Findings = append(append([]policy.Finding{}, before.Findings...), policy.Finding{Kind: "unmatched_selector", Rule: "source/readable", Path: "absent.rs/"})
+	if _, err = check(tool(&missing, 2)); err == nil {
+		t.Fatal("genuinely missing baseline input accepted")
+	}
 }
 
 // A transformation that explains one hunk of a file still left unexplained by
 // another approves that divergence: it is resolved, not lost coverage. A
 // hunk that merely stops being detected remains coverage loss.
+func TestParityRepairsAnExplicitFileRootWithoutLosingCoverage(t *testing.T) {
+	for _, scenario := range []struct {
+		name      string
+		inherited bool
+	}{{"fork-owned", false}, {"inherited", true}} {
+		t.Run(scenario.name, func(t *testing.T) { testFileRootRepair(t, scenario.inherited) })
+	}
+}
+
+func testFileRootRepair(t *testing.T, inherited bool) {
+	f, _ := parityFixture(t)
+	f.Write("AGENTS.md", "# Directions\nPreserve source.\n")
+	if inherited {
+		f.Config.Upstream = f.Commit()
+	}
+	f.Config.Roots = append(f.Config.Roots, "AGENTS.md")
+	f.Config.Families = append(f.Config.Families, policy.Family{ID: "directions", Title: "Directions", Paths: []string{"AGENTS.md"}})
+	f.Save()
+	baseline := f.Commit()
+	repo, config := f.Open()
+	before, err := analysis.Check(repo, config, analysis.CheckOptions{Rev: baseline})
+	if err != nil {
+		t.Fatal(err)
+	}
+	before.Findings = append(before.Findings, policy.Finding{Kind: "unmatched_selector", Rule: "source/readable", Path: "AGENTS.md/"})
+	before.Status = "failed"
+	data, err := json.Marshal(before)
+	if err != nil {
+		t.Fatal(err)
+	}
+	directory := t.TempDir()
+	file, script := filepath.Join(directory, "report.json"), filepath.Join(directory, "concave")
+	if err := os.WriteFile(file, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(script, []byte("#!/bin/sh\ncat '"+file+"'\nexit 2\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	f.Write("packaging/other.ts", "export const other = 1;\n")
+	candidate := f.Commit()
+	result, err := analysis.CheckParity(repo, analysis.ParityOptions{Baseline: baseline, Candidate: candidate, BaselineTool: script})
+	if err != nil || result.Status != "passed" || len(result.CoverageLoss) != 0 {
+		t.Fatal(result, err)
+	}
+	f.Config.Roots = f.Config.Roots[:len(f.Config.Roots)-1]
+	f.Config.Families = f.Config.Families[:len(f.Config.Families)-1]
+	f.Save()
+	result, err = analysis.CheckParity(repo, analysis.ParityOptions{Baseline: baseline, Candidate: f.Commit(), BaselineTool: script})
+	if err != nil || result.Status != "failed" || len(result.CoverageLoss) == 0 {
+		t.Fatal("removing the actual file's coverage was accepted", result, err)
+	}
+}
+
 func TestParityAcceptsAHunkTheCandidatePolicyApproves(t *testing.T) {
 	f, path := parityFixture(t)
 	f.Write(path, edit(upstreamSource, "fn two() {}", "fn two_renamed() {}", "fn seven() {}", "fn seven() { fork(); }"))

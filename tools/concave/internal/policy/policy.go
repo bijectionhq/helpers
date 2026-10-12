@@ -757,7 +757,24 @@ func (c *Config) DerivedFor(path string) *Derived {
 func (c *Config) RootSelectors() []string {
 	out := []string{}
 	for _, s := range c.Roots {
-		out = append(out, strings.TrimSuffix(s, "/")+"/")
+		// An exact family selector declares a file explicitly. Directory roots
+		// retain their existing spelling and normalization; no extension guess.
+		file := false
+		for _, family := range c.Families {
+			if !strings.HasSuffix(s, "/") && slices.Contains(family.Paths, s) {
+				file = true
+			}
+		}
+		for _, check := range c.Checks {
+			if !strings.HasSuffix(s, "/") && slices.Contains(check.Inputs, s) {
+				file = true
+			}
+		}
+		if file {
+			out = append(out, s)
+		} else {
+			out = append(out, strings.TrimSuffix(s, "/")+"/")
+		}
 	}
 	return out
 }

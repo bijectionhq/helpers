@@ -1,0 +1,9 @@
+# Maintenance tooling provenance
+
+The copied `tools/concave` source and `scripts/land.py` and
+`scripts/conflict_marker_check.py` come from `bijectionhq/bijection` at the
+revision pinned in `tools/concave-source.json`. Their repository license is retained
+verbatim in `tools/concave/LICENSE.md`; it is separate from the original
+component repository's license. These maintenance files are not included in
+the component npm packages. `tools/concave-source.json` pins the source tree.
+Original component licenses, copyrights and notices remain unchanged.
