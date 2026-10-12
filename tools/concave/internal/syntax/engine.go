@@ -76,6 +76,9 @@ type Engine struct {
 	rewriteBytes int
 }
 
+// NewPinned bypasses ambient tool selection for captured-source checks.
+func NewPinned(ctx context.Context, path string) *Engine { return &Engine{ctx: ctx, path: path} }
+
 func New(ctx context.Context, root string) *Engine {
 	path := os.Getenv("CONCAVE_AST_GREP")
 	if path == "" {

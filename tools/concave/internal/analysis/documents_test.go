@@ -33,7 +33,7 @@ func TestHistoricalDocumentsRefuseDifferentParserInputs(t *testing.T) {
 	f.Save()
 	revision := f.Commit()
 	repo, config := f.Open()
-	f.Write("npm-packages/docs/package.json", `{"name":"different-parser-definition"}`)
+	f.Write("tools/concave/testdata/mdx/package.json", `{"name":"different-parser-definition"}`)
 	_, err := analysis.Analyze(repo, config, analysis.Options{Rev: revision, Paths: []string{"apps/docs/page.mdx"}})
 	if err == nil || !strings.Contains(err.Error(), "parser inputs differ") {
 		t.Fatal("historical parser identity was not checked", err)
@@ -44,7 +44,7 @@ func TestHistoricalDocumentsRefuseDifferentParserInputs(t *testing.T) {
 // differs from the installed one only in another project names the same
 // parser; one that resolves a package the parser loads does not.
 func TestHistoricalDocumentsBindTheParsersLockfileClosure(t *testing.T) {
-	const lock = "npm-packages/pnpm-lock.yaml"
+	const lock = "tools/concave/testdata/pnpm-lock.yaml"
 	f := testrepo.New(t)
 	f.Documents()
 	f.Config.Documents = &policy.Documents{Paths: []string{"apps/docs/"}}

@@ -12,6 +12,7 @@ import (
 
 	"concave/internal/artifact"
 	"concave/internal/contracts"
+	"concave/internal/naming"
 	"concave/internal/process"
 	"concave/internal/repository"
 	"concave/internal/syntax"
@@ -168,6 +169,7 @@ type Manifest struct {
 	Rewrites      map[string][][2]string `json:"rewrites"`
 }
 type Config struct {
+	Naming                 *naming.Policy             `json:"naming,omitempty"`
 	Documents              *Documents                 `json:"documents,omitempty"`
 	Environments           map[string]Environment     `json:"environments,omitempty"`
 	Checks                 map[string]CheckDefinition `json:"checks,omitempty"`
@@ -247,6 +249,18 @@ const Format = 2
 // policy itself, and "*" stands for every member of a map or list there, as in
 // {In: "checks.*", From: "environment", To: "environments"}.
 type Rename struct{ In, From, To string }
+
+// NamingPolicy decodes only the selected captured policy; no repository or Git is opened.
+func NamingPolicy(body []byte) (*naming.Policy, error) {
+	c, err := decodePolicy(body)
+	if err != nil {
+		return nil, err
+	}
+	if c.Naming == nil {
+		return nil, fmt.Errorf("repository declares no naming policy")
+	}
+	return c.Naming, c.Naming.Validate()
+}
 
 // migrations lists, per earlier format, the renames that produce the next one,
 // so a baseline policy written before a rename decodes exactly, never
@@ -420,6 +434,11 @@ func Load(r *repository.Repo, ref string) (*Config, error) {
 	return c, nil
 }
 func (c *Config) Validate() error {
+	if c.Naming != nil {
+		if err := c.Naming.Validate(); err != nil {
+			return err
+		}
+	}
 	if err := c.validateDocuments(); err != nil {
 		return err
 	}

@@ -9,14 +9,12 @@ import (
 	"concave/internal/repository"
 )
 
-// Bind the installed parser's declared dependency path: the docs importer
-// selects @docusaurus/core, and the adapter resolves every parser package
-// through that package's dependency closure. Other docs dependencies, including
-// workspace SDK development tools, are never loaded by the parser.
+// Bind the standalone parser runtime and each package the adapter loads.
+// TypeScript fixture dependencies remain outside this runtime closure.
 const (
-	lockPath         = "npm-packages/pnpm-lock.yaml"
-	lockImporter     = "docs"
-	parserDependency = "@docusaurus/core"
+	lockPath     = "tools/concave/testdata/pnpm-lock.yaml"
+	lockImporter = "mdx"
+	nodePinPath  = "tools/concave/testdata/mdx/.nvmrc"
 )
 
 type lockEntries map[string][]string
@@ -274,13 +272,18 @@ func parserLock(data []byte) (string, error) {
 		}
 		if next.importer && next.key == lockImporter {
 			selected := []lockDependency{}
+			required := map[string]bool{"@mdx-js/mdx": false, "gray-matter": false, "js-yaml": false, "remark-gfm": false}
 			for _, dependency := range found {
-				if dependency.name == parserDependency {
+				if seen, ok := required[dependency.name]; ok {
+					if seen {
+						return "", fmt.Errorf("parser declares %s more than once", dependency.name)
+					}
+					required[dependency.name] = true
 					selected = append(selected, dependency)
 				}
 			}
-			if len(selected) != 1 {
-				return "", fmt.Errorf("docs must declare exactly one %s parser dependency", parserDependency)
+			if len(selected) != len(required) {
+				return "", fmt.Errorf("mdx runtime must declare each parser dependency exactly once")
 			}
 			found = selected
 		}

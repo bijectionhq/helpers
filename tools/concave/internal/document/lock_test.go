@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-// The parser loads core and its peer and optional dependencies. The docs SDK
+// The parser owns its MDX, YAML and Markdown dependencies. Unrelated fixture
 // and development tools are installed in the same workspace but never loaded.
 const sampleLock = `lockfileVersion: '9.0'
 
@@ -20,11 +20,20 @@ overrides:
 
 importers:
 
-  docs:
+  mdx:
     dependencies:
-      '@docusaurus/core':
+      '@mdx-js/mdx':
         specifier: ~1.0.0
         version: 1.0.0(peer@2.0.0)
+      gray-matter:
+        specifier: 1.0.0
+        version: 1.0.0
+      js-yaml:
+        specifier: 1.0.0
+        version: 1.0.0
+      remark-gfm:
+        specifier: 1.0.0
+        version: 1.0.0
       library:
         specifier: workspace:*
         version: link:../library
@@ -47,8 +56,17 @@ importers:
 
 packages:
 
-  '@docusaurus/core@1.0.0':
+  '@mdx-js/mdx@1.0.0':
     resolution: {integrity: sha512-core}
+
+  gray-matter@1.0.0:
+    resolution: {integrity: sha512-matter}
+
+  js-yaml@1.0.0:
+    resolution: {integrity: sha512-yaml}
+
+  remark-gfm@1.0.0:
+    resolution: {integrity: sha512-gfm}
 
   actual@3.0.0:
     resolution: {integrity: sha512-actual}
@@ -67,13 +85,19 @@ packages:
 
 snapshots:
 
-  '@docusaurus/core@1.0.0(peer@2.0.0)':
+  '@mdx-js/mdx@1.0.0(peer@2.0.0)':
     dependencies:
       peer: 2.0.0
     optionalDependencies:
       optional: 1.0.0
     transitivePeerDependencies:
       - supports-color
+
+  gray-matter@1.0.0: {}
+
+  js-yaml@1.0.0: {}
+
+  remark-gfm@1.0.0: {}
 
   actual@3.0.0: {}
 
@@ -120,7 +144,7 @@ func TestParserLockIgnoresOtherProjects(t *testing.T) {
 	}
 }
 
-func TestParserLockBindsTheDocsClosure(t *testing.T) {
+func TestParserLockBindsTheRuntimeClosure(t *testing.T) {
 	want, err := parserLock([]byte(sampleLock))
 	if err != nil {
 		t.Fatal(err)
@@ -129,7 +153,7 @@ func TestParserLockBindsTheDocsClosure(t *testing.T) {
 		"direct package":      edited(t, sampleLock, "sha512-core", "sha512-changed"),
 		"peer":                edited(t, sampleLock, "sha512-peer", "sha512-changed"),
 		"optional dependency": edited(t, sampleLock, "sha512-optional", "sha512-changed"),
-		"docs importer":       edited(t, sampleLock, "specifier: ~1.0.0", "specifier: ^1.0.0"),
+		"parser importer":     edited(t, sampleLock, "specifier: ~1.0.0", "specifier: ^1.0.0"),
 		"snapshot edge":       edited(t, sampleLock, "      - supports-color", "      - debug"),
 		"settings":            edited(t, sampleLock, "autoInstallPeers: true", "autoInstallPeers: false"),
 		"format":              edited(t, sampleLock, "lockfileVersion: '9.0'", "lockfileVersion: '9.1'"),
@@ -162,11 +186,11 @@ func TestParserLockRefusesWhatItCannotRead(t *testing.T) {
 	for name, lock := range map[string]string{
 		"missing snapshot":   edited(t, sampleLock, "  peer@2.0.0: {}\n", ""),
 		"missing package":    edited(t, sampleLock, "  optional@1.0.0:\n    resolution: {integrity: sha512-optional}\n", ""),
-		"missing docs":       edited(t, sampleLock, "\n  docs:\n", "\n  documents:\n"),
-		"missing parser":     edited(t, sampleLock, "      '@docusaurus/core':", "      '@scope/unloaded':"),
+		"missing runtime":    edited(t, sampleLock, "\n  mdx:\n", "\n  documents:\n"),
+		"missing parser":     edited(t, sampleLock, "      '@mdx-js/mdx':", "      '@scope/unloaded':"),
 		"missing version":    edited(t, sampleLock, "        version: 1.0.0(peer@2.0.0)\n", ""),
 		"double-quoted key":  edited(t, sampleLock, "  actual@3.0.0: {}", `  "actual@3.0.0": {}`),
-		"unterminated key":   edited(t, sampleLock, "  '@docusaurus/core@1.0.0':", "  '@docusaurus/core@1.0.0:"),
+		"unterminated key":   edited(t, sampleLock, "  '@mdx-js/mdx@1.0.0':", "  '@mdx-js/mdx@1.0.0:"),
 		"scalar entry":       edited(t, sampleLock, "  actual@3.0.0: {}", "  actual@3.0.0: text"),
 		"duplicate entry":    edited(t, sampleLock, "  leaf@1.0.0: {}", "  leaf@1.0.0: {}\n\n  leaf@1.0.0: {}"),
 		"tab":                edited(t, sampleLock, "  leaf@1.0.0: {}", "\tleaf@1.0.0: {}"),

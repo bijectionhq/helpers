@@ -20,7 +20,7 @@ func (e *Engine) execute(request []byte, sources int) (process.Result, error) {
 		return process.Result{}, fmt.Errorf("MDX request exceeds bound")
 	}
 	if e.node == "" {
-		version, err := os.ReadFile(filepath.Join(e.root, ".nvmrc"))
+		version, err := os.ReadFile(filepath.Join(e.root, nodePinPath))
 		if err != nil {
 			return process.Result{}, err
 		}

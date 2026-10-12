@@ -123,6 +123,7 @@ func (a *app) command() *cobra.Command {
 	root.PersistentFlags().BoolVar(&a.jsonMode, "json", false, "emit versioned JSON")
 	root.PersistentFlags().BoolVar(&a.timings, "timings", false, "report elapsed time, available phases, Git processes and input reads on stderr")
 	open := func() (*repository.Repo, error) { return a.open() }
+	a.registerNaming(root)
 	a.registerInspection(root)
 	a.registerContribution(root)
 	a.registerRules(root)

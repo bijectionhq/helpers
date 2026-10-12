@@ -109,12 +109,15 @@ func TestNativeSnippetPlanAppliesExactImportsAndBindsRenderer(t *testing.T) {
 	f.Documents()
 	_, file, _, _ := runtime.Caller(0)
 	root := filepath.Clean(filepath.Join(filepath.Dir(file), "../../../.."))
-	for _, name := range []string{"npm-packages/docs/src/snippet.tsx", "npm-packages/docs/recovery/snippets.mjs", "npm-packages/docs/recovery/migrate.mjs", "npm-packages/docs/recovery/content.mjs", "npm-packages/bijection/scripts/facade.mjs", "npm-packages/bijection/scripts/parity-transforms.json"} {
+	for _, name := range []string{".nvmrc", "npm-packages/docs/package.json", "npm-packages/pnpm-lock.yaml", "npm-packages/docs/src/snippet.tsx", "npm-packages/docs/recovery/snippets.mjs", "npm-packages/docs/recovery/migrate.mjs", "npm-packages/docs/recovery/content.mjs", "npm-packages/bijection/scripts/facade.mjs", "npm-packages/bijection/scripts/parity-transforms.json"} {
 		data, err := os.ReadFile(filepath.Join(root, name))
 		if err != nil {
 			t.Fatal(err)
 		}
 		f.Write(name, string(data))
+	}
+	if err := os.Symlink(filepath.Join(root, "npm-packages/docs/node_modules"), filepath.Join(f.Root, "npm-packages/docs/node_modules")); err != nil {
+		f.T.Fatal(err)
 	}
 	if err := os.Symlink(filepath.Join(root, "npm-packages/bijection/node_modules"), filepath.Join(f.Root, "npm-packages/bijection/node_modules")); err != nil {
 		t.Fatal(err)

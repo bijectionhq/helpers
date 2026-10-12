@@ -13,10 +13,10 @@ import (
 // RuntimeInputs identifies the installed parser. Callers bind these inputs to
 // their captured source; parsing never installs dependencies or builds a site.
 func RuntimeInputs() []string {
-	return []string{".nvmrc", "npm-packages/docs/package.json", lockPath}
+	return []string{nodePinPath, "tools/concave/testdata/mdx/package.json", lockPath}
 }
 func RecoveryInputs() []string {
-	return append(RuntimeInputs(), "npm-packages/docs/src/snippet.tsx", "npm-packages/docs/recovery/snippets.mjs", "npm-packages/docs/recovery/migrate.mjs", "npm-packages/docs/recovery/content.mjs", "npm-packages/bijection/scripts/facade.mjs", "npm-packages/bijection/scripts/parity-transforms.json")
+	return append(RuntimeInputs(), ".nvmrc", "npm-packages/docs/package.json", "npm-packages/pnpm-lock.yaml", "npm-packages/docs/src/snippet.tsx", "npm-packages/docs/recovery/snippets.mjs", "npm-packages/docs/recovery/migrate.mjs", "npm-packages/docs/recovery/content.mjs", "npm-packages/bijection/scripts/facade.mjs", "npm-packages/bijection/scripts/parity-transforms.json")
 }
 func Native(path string) bool {
 	return strings.HasPrefix(path, "npm-packages/docs/docs/") && strings.HasSuffix(path, ".mdx")

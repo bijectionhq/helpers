@@ -16,19 +16,17 @@ if (request.format !== 1 || request.files.length > 4096)
   throw new Error("Invalid MDX batch");
 if (
   process.version.slice(1) !==
-  fs.readFileSync(path.join(request.root, ".nvmrc"), "utf8").trim()
+  fs.readFileSync(path.join(request.root, "tools/concave/testdata/mdx/.nvmrc"), "utf8").trim()
 )
   throw new Error("Use the repository pinned Node for MDX analysis");
 const require = createRequire(
-  path.join(request.root, "npm-packages/docs/package.json"),
+  path.join(request.root, "tools/concave/testdata/mdx/package.json"),
 );
-const core = createRequire(require.resolve("@docusaurus/core/package.json"));
-const loader = createRequire(core.resolve("@docusaurus/mdx-loader"));
-const matter = loader("gray-matter");
-// gray-matter's own YAML engine decides what a frontmatter comment is.
-const yaml = createRequire(loader.resolve("gray-matter"))("js-yaml");
-const { createProcessor } = await import(loader.resolve("@mdx-js/mdx"));
-const { default: gfm } = await import(loader.resolve("remark-gfm"));
+const matter = require("gray-matter");
+// The parser runtime pins the same YAML engine used by gray-matter.
+const yaml = require("js-yaml");
+const { createProcessor } = await import(require.resolve("@mdx-js/mdx"));
+const { default: gfm } = await import(require.resolve("remark-gfm"));
 const processors = Object.fromEntries(
   ["md", "mdx"].map((format) => [
     format,
