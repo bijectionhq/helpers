@@ -553,9 +553,13 @@ export interface GenericOrderedQuery<T> extends AsyncIterable<T> {
 }
 
 // concave:begin stream-contract-stream-database-reader
+// preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: Upstream combinators implement the extended reader contract.
+// concave:invariant stream-api
+// Stream ordering, cursor pagination and iteration keep their inherited meaning.
+// The wrapper advertises only implemented stream methods, not native extensions.
 export class StreamDatabaseReader<
   Schema extends SchemaDefinition<any, boolean>,
 > {
@@ -614,6 +618,7 @@ export type QueryReflection<
 };
 
 // concave:begin stream-contract-streamable-query
+// preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: Upstream combinators implement the extended reader contract.
@@ -629,6 +634,7 @@ export abstract class StreamableQuery<
 }
 
 // concave:begin stream-contract-stream-query-initializer
+// preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: Upstream combinators implement the extended reader contract.
@@ -680,6 +686,7 @@ export class StreamQueryInitializer<
     return this.inner().order(order);
   }
   // concave:begin stream-query-initializer-reflection
+  // preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: The compiler names inferred results through public SDK types.
@@ -688,6 +695,7 @@ reflect(): QueryReflection<Schema, T, "by_creation_time"> {
     return this.inner().reflect();
   }
   // concave:begin stream-query-initializer-iterator
+  // preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: The compiler names inferred results through public SDK types.
@@ -705,6 +713,7 @@ iterWithKeys(trackBandwidth = false): StreamIterable<DocumentByName<DM<Schema>, 
     return this.inner().getIndexFields();
   }
   // concave:begin stream-query-initializer-bounds
+  // preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: The compiler names inferred results through public SDK types.
@@ -716,6 +725,7 @@ narrow(indexBounds: IndexBounds): QueryStream<DocumentByName<DM<Schema>, T>> {
 
 // Not to be confused with QueryStream or StreamableQuery.
 // concave:begin stream-contract-stream-query
+// preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: Upstream combinators implement the extended reader contract.
@@ -749,6 +759,7 @@ export class StreamQuery<
     return this.order("asc");
   }
   // concave:begin stream-query-reflection
+  // preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: The compiler names inferred results through public SDK types.
@@ -757,6 +768,7 @@ reflect(): QueryReflection<Schema, T, IndexName> {
     return this.inner().reflect();
   }
   // concave:begin stream-query-iterator
+  // preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: The compiler names inferred results through public SDK types.
@@ -774,6 +786,7 @@ iterWithKeys(trackBandwidth = false): StreamIterable<DocumentByName<DM<Schema>, 
     return this.inner().getIndexFields();
   }
   // concave:begin stream-query-bounds
+  // preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: The compiler names inferred results through public SDK types.
@@ -784,6 +797,7 @@ narrow(indexBounds: IndexBounds): QueryStream<DocumentByName<DM<Schema>, T>> {
 }
 
 // concave:begin stream-contract-ordered-stream-query
+// preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Streams expose their own iterator and pagination contract; they do not implement native reader projections, counts or limits.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: Upstream combinators implement the extended reader contract.
@@ -802,6 +816,7 @@ export class OrderedStreamQuery<
     super();
   }
   // concave:begin ordered-stream-query-reflection
+  // preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: The compiler names inferred results through public SDK types.
@@ -865,6 +880,7 @@ reflect(): QueryReflection<Schema, T, IndexName> {
     return this.parent.q.indexFields;
   }
   // concave:begin ordered-stream-query-bounds
+  // preserves: packages/convex-helpers/server/stream.ts#stream-api
 // why: Explicit public result types keep native schema extension internals out of emitted declarations without changing execution.
 // witness: packages/convex-helpers/server/stream.test.ts
 // remove-when: The compiler names inferred results through public SDK types.
