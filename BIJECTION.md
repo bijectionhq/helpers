@@ -3,8 +3,10 @@
 This is a maintained fork of get-convex/convex-helpers at `d9dedf7a83259aa677a390a3e50a641218d10170`.
 The package keeps inherited validators, function references, serialization, and
 transaction behavior. Its SDK imports resolve through the application's single
-`bijection` installation. Native agent runs remain owned by the platform engine;
-conversation storage and streaming remain owned by this component.
+`bijection` installation. This package is a stateless helper library. The native engine owns database
+records, transactions and agent runs; the Agent component owns conversation
+storage. These helpers compose the existing SDK contracts and acquire no
+authority or independent persistent state.
 
 Every inherited difference is checked by the same Concave source in Bijection.
 Mechanical module and public identifier changes have explicit recipes in
